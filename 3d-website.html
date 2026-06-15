@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Experience</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #0a0a0f; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+        canvas { display: block; }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+            color: #fff;
+        }
+
+        .overlay h1 {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, #f0f0ff 0%, #8b8bff 50%, #ff6b9d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1.2s ease-out 0.2s both;
+        }
+
+        .overlay p {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            color: rgba(255,255,255,0.6);
+            margin-top: 1rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-weight: 300;
+            animation: fadeInUp 1.2s ease-out 0.5s both;
+        }
+
+        .overlay .badge {
+            margin-top: 2.5rem;
+            display: flex;
+            gap: 1rem;
+            pointer-events: auto;
+            animation: fadeInUp 1.2s ease-out 0.8s both;
+        }
+
+        .overlay .badge a {
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .overlay .badge a:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139,139,255,0.25);
+        }
+
+        .overlay .badge a.primary {
+            background: linear-gradient(135deg, #6b6bff, #ff6b9d);
+            border: none;
+        }
+
+        .overlay .badge a.primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(107,107,255,0.4);
+        }
+
+        .scroll-hint {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .scroll-hint span {
+            display: block;
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+            margin: 0.5rem auto 0;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50%      { transform: translateX(-50%) translateY(-8px); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay">
+    <h1>3D Experience</h1>
+    <p>Interaktive WebGL-Welten</p>
+    <div class="badge">
+        <a href="#" class="primary">Erkunden</a>
+        <a href="#">Mehr erfahren</a>
+    </div>
+</div>
+
+<div class="scroll-hint">
+    Scroll Down
+    <span></span>
+</div>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+// --- Setup ---
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x0a0a0f, 0.025);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 2, 12);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+document.body.prepend(renderer.domElement);
+
+// --- Post Processing ---
+const composer = new EffectComposer(renderer);
+const renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+
+const bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    0.4,  // strength
+    0.2,  // radius
+    0.1   // threshold
+);
+composer.addPass(bloomPass);
+
+// --- Lights ---
+const ambientLight = new THREE.AmbientLight(0x222244, 0.5);
+scene.add(ambientLight);
+
+const pointLight1 = new THREE.PointLight(0x6b6bff, 80, 30);
+pointLight1.position.set(5, 5, 5);
+scene.add(pointLight1);
+
+const pointLight2 = new THREE.PointLight(0xff6b9d, 60, 30);
+pointLight2.position.set(-5, -3, 5);
+scene.add(pointLight2);
+
+const pointLight3 = new THREE.PointLight(0x00d4ff, 40, 20);
+pointLight3.position.set(0, 8, -5);
+scene.add(pointLight3);
+
+// --- Main Objects ---
+const group = new THREE.Group();
+scene.add(group);
+
+// Center Torus Knot (main hero object)
+const knotGeo = new THREE.TorusKnotGeometry(1.2, 0.4, 180, 24);
+const knotMat = new THREE.MeshPhysicalMaterial({
+    color: 0x6b6bff,
+    metalness: 0.3,
+    roughness: 0.2,
+    clearcoat: 0.8,
+    clearcoatRoughness: 0.2,
+    emissive: 0x3a3aff,
+    emissiveIntensity: 0.15,
+});
+const knot = new THREE.Mesh(knotGeo, knotMat);
+knot.castShadow = true;
+group.add(knot);
+
+// Ring around the knot
+const ringGeo = new THREE.TorusGeometry(1.8, 0.03, 32, 64);
+const ringMat = new THREE.MeshPhysicalMaterial({
+    color: 0xff6b9d,
+    emissive: 0xff6b9d,
+    emissiveIntensity: 0.3,
+    transparent: true,
+    opacity: 0.6,
+});
+const ring = new THREE.Mesh(ringGeo, ringMat);
+ring.rotation.x = Math.PI / 2;
+ring.rotation.z = 0.3;
+group.add(ring);
+
+const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(2.2, 0.02, 16, 64),
+    new THREE.MeshPhysicalMaterial({
+        color: 0x00d4ff,
+        emissive: 0x00d4ff,
+        emissiveIntensity: 0.2,
+        transparent: true,
+        opacity: 0.4,
+    })
+);
+ring2.rotation.x = 1.2;
+ring2.rotation.y = 0.8;
+group.add(ring2);
+
+// Orbiting small spheres
+const orbitGroup = new THREE.Group();
+group.add(orbitGroup);
+
+const orbCount = 12;
+for (let i = 0; i < orbCount; i++) {
+    const angle = (i / orbCount) * Math.PI * 2;
+    const radius = 2.8;
+    const sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(0.08, 8, 8),
+        new THREE.MeshPhysicalMaterial({
+            color: new THREE.Color().setHSL(i / orbCount, 1, 0.6),
+            emissive: new THREE.Color().setHSL(i / orbCount, 1, 0.3),
+            emissiveIntensity: 0.8,
+        })
+    );
+    sphere.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius * 0.5, 0);
+    orbitGroup.add(sphere);
+}
+
+// Floating geometric shapes around
+const shapes = [];
+const colors = [0x6b6bff, 0xff6b9d, 0x00d4ff, 0xffd700, 0x7bff7b];
+const geometries = [
+    new THREE.IcosahedronGeometry(0.3, 0),
+    new THREE.OctahedronGeometry(0.25, 0),
+    new THREE.TetrahedronGeometry(0.3, 0),
+    new THREE.BoxGeometry(0.25, 0.25, 0.25),
+];
+
+for (let i = 0; i < 30; i++) {
+    const geo = geometries[i % geometries.length];
+    const mat = new THREE.MeshPhysicalMaterial({
+        color: colors[i % colors.length],
+        metalness: 0.2,
+        roughness: 0.3,
+        emissive: colors[i % colors.length],
+        emissiveIntensity: 0.1,
+        transparent: true,
+        opacity: 0.5 + Math.random() * 0.5,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const radius = 4 + Math.random() * 4;
+
+    mesh.position.x = Math.sin(phi) * Math.cos(theta) * radius;
+    mesh.position.y = Math.sin(phi) * Math.sin(theta) * radius;
+    mesh.position.z = Math.cos(phi) * radius;
+
+    mesh.userData = {
+        rotSpeed: 0.005 + Math.random() * 0.02,
+        rotAxis: new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(),
+        floatSpeed: 0.2 + Math.random() * 0.3,
+        floatPhase: Math.random() * Math.PI * 2,
+        origPos: mesh.position.clone(),
+    };
+
+    scene.add(mesh);
+    shapes.push(mesh);
+}
+
+// --- Particles ---
+const particleCount = 4000;
+const positions = new Float32Array(particleCount * 3);
+const sizes = new Float32Array(particleCount);
+const velocities = [];
+
+for (let i = 0; i < particleCount; i++) {
+    const radius = 15 + Math.random() * 15;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+
+    positions[i * 3] = Math.sin(phi) * Math.cos(theta) * radius;
+    positions[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * radius;
+    positions[i * 3 + 2] = Math.cos(phi) * radius;
+    sizes[i] = 0.5 + Math.random() * 2;
+
+    velocities.push({
+        x: (Math.random() - 0.5) * 0.002,
+        y: (Math.random() - 0.5) * 0.002,
+        z: (Math.random() - 0.5) * 0.002,
+    });
+}
+
+const particleGeo = new THREE.BufferGeometry();
+particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+particleGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+const particleMat = new THREE.PointsMaterial({
+    color: 0x8b8bff,
+    size: 0.06,
+    transparent: true,
+    opacity: 0.6,
+    blending: THREE.AdditiveBlending,
+    sizeAttenuation: true,
+});
+
+const particles = new THREE.Points(particleGeo, particleMat);
+scene.add(particles);
+
+// --- Mouse Tracking ---
+let mouseX = 0;
+let mouseY = 0;
+let targetX = 0;
+let targetY = 0;
+
+document.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+    mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+});
+
+// --- Resize ---
+window.addEventListener('resize', () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+    composer.setSize(w, h);
+});
+
+// --- Animation Loop ---
+const clock = new THREE.Clock();
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    const t = clock.getElapsedTime();
+
+    // Smooth mouse follow
+    targetX += (mouseX - targetX) * 0.05;
+    targetY += (mouseY - targetY) * 0.05;
+
+    // Main group rotation
+    group.rotation.x = targetY * 0.2 + Math.sin(t * 0.1) * 0.1;
+    group.rotation.y = targetX * 0.3 + t * 0.15;
+    group.rotation.z = Math.sin(t * 0.05) * 0.05;
+
+    // Torus knot pulse
+    const scale = 1 + Math.sin(t * 0.5) * 0.03;
+    knot.scale.set(scale, scale, scale);
+
+    // Ring rotations
+    ring.rotation.z = t * 0.2 + 0.3;
+    ring2.rotation.x = t * 0.15 + 1.2;
+    ring2.rotation.y = t * 0.1 + 0.8;
+
+    // Orbiting spheres
+    orbitGroup.rotation.x = Math.sin(t * 0.2) * 0.2;
+    orbitGroup.rotation.y = t * 0.3;
+    orbitGroup.rotation.z = Math.sin(t * 0.15) * 0.1;
+
+    // Floating shapes
+    for (const mesh of shapes) {
+        mesh.rotateOnWorldAxis(mesh.userData.rotAxis, mesh.userData.rotSpeed);
+        const float = Math.sin(t * mesh.userData.floatSpeed + mesh.userData.floatPhase) * 0.15;
+        mesh.position.y = mesh.userData.origPos.y + float;
+    }
+
+    // Particles slow drift
+    const pos = particles.geometry.attributes.position.array;
+    for (let i = 0; i < particleCount; i++) {
+        pos[i * 3] += velocities[i].x;
+        pos[i * 3 + 1] += velocities[i].y;
+        pos[i * 3 + 2] += velocities[i].z;
+
+        // Wrap around
+        const radius = Math.sqrt(
+            pos[i * 3] ** 2 + pos[i * 3 + 1] ** 2 + pos[i * 3 + 2] ** 2
+        );
+        if (radius > 35) {
+            const nR = 10 + Math.random() * 5;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            pos[i * 3] = Math.sin(phi) * Math.cos(theta) * nR;
+            pos[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * nR;
+            pos[i * 3 + 2] = Math.cos(phi) * nR;
+        }
+    }
+    particles.geometry.attributes.position.needsUpdate = true;
+
+    // Camera subtle movement
+    camera.position.x = Math.sin(t * 0.02) * 1.5 + targetX * 1.5;
+    camera.position.y = 2 + Math.sin(t * 0.03) * 0.5 + targetY * 1;
+    camera.lookAt(0, 0, 0);
+
+    composer.render();
+}
+
+animate();
+</script>
+</body>
+</html>

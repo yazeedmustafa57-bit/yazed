@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dark Mode 3D Experience</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            overflow: hidden;
+            background: #05050a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #fff;
+        }
+
+        canvas { display: block; position: fixed; top: 0; left: 0; }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .overlay .eyebrow {
+            font-size: 0.8rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 1rem;
+            animation: fadeUp 1s ease-out 0.3s both;
+        }
+
+        .overlay h1 {
+            font-size: clamp(2.5rem, 7vw, 6rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #e0e0ff 0%, #8888ff 40%, #ff66aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeUp 1s ease-out 0.5s both;
+        }
+
+        .overlay p.sub {
+            font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+            color: rgba(255,255,255,0.5);
+            margin-top: 1rem;
+            max-width: 500px;
+            font-weight: 300;
+            line-height: 1.6;
+            animation: fadeUp 1s ease-out 0.7s both;
+        }
+
+        .overlay .actions {
+            margin-top: 2.5rem;
+            display: flex;
+            gap: 1rem;
+            pointer-events: auto;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeUp 1s ease-out 0.9s both;
+        }
+
+        .overlay .actions a {
+            padding: 0.8rem 2.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.35s ease;
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            cursor: pointer;
+        }
+
+        .overlay .actions a:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(136,136,255,0.2);
+        }
+
+        .overlay .actions a.primary {
+            background: linear-gradient(135deg, #6666ff, #ff5599);
+            border: none;
+            box-shadow: 0 4px 20px rgba(102,102,255,0.3);
+        }
+
+        .overlay .actions a.primary:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 35px rgba(102,102,255,0.5);
+        }
+
+        .hint {
+            position: fixed;
+            bottom: 2.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.4;
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+
+        .hint span {
+            font-size: 0.7rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .hint .line {
+            width: 1px;
+            height: 35px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+        }
+
+        .corner {
+            position: fixed;
+            top: 2rem;
+            right: 2.5rem;
+            z-index: 10;
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.2);
+            pointer-events: none;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+            50%      { opacity: 0.7; transform: translateX(-50%) translateY(-6px); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="corner">✦ INTERACTIVE 3D</div>
+
+<div class="overlay">
+    <div class="eyebrow">✦ WebGL Experience</div>
+    <h1>Dark Matter</h1>
+    <p class="sub">Ein dynamisches 3D-Universum aus Licht, Bewegung und Geometrie —<br/>bewege die Maus und erkunde.</p>
+    <div class="actions">
+        <a href="#" class="primary">Universum betreten</a>
+        <a href="#">Mehr erfahren</a>
+    </div>
+</div>
+
+<div class="hint">
+    <span>Bewege die Maus</span>
+    <div class="line"></div>
+</div>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+// ============ SCENE SETUP ============
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x05050a);
+
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 1.5, 10);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+document.body.prepend(renderer.domElement);
+
+// ============ POST PROCESSING ============
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+
+const bloom = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    0.6,   // strength
+    0.4,   // radius
+    0.05   // threshold
+);
+composer.addPass(bloom);
+
+// ============ LIGHTS ============
+const ambient = new THREE.AmbientLight(0x222244, 0.4);
+scene.add(ambient);
+
+const light1 = new THREE.PointLight(0x6666ff, 100, 25);
+light1.position.set(4, 4, 6);
+scene.add(light1);
+
+const light2 = new THREE.PointLight(0xff5599, 80, 25);
+light2.position.set(-4, -3, 6);
+scene.add(light2);
+
+const light3 = new THREE.PointLight(0x44ddff, 50, 20);
+light3.position.set(0, 7, -4);
+scene.add(light3);
+
+// ============ MAIN 3D OBJECT ============
+const mainGroup = new THREE.Group();
+scene.add(mainGroup);
+
+// --- Core Icosahedron (inner glow) ---
+const icoGeo = new THREE.IcosahedronGeometry(1.6, 1);
+const icoMat = new THREE.MeshPhysicalMaterial({
+    color: 0x4444cc,
+    metalness: 0.1,
+    roughness: 0.15,
+    clearcoat: 0.9,
+    clearcoatRoughness: 0.1,
+    emissive: 0x3333aa,
+    emissiveIntensity: 0.3,
+    transparent: true,
+    opacity: 0.85,
+});
+const ico = new THREE.Mesh(icoGeo, icoMat);
+ico.castShadow = true;
+mainGroup.add(ico);
+
+// --- Wireframe Icosahedron (outer shell) ---
+const wireGeo = new THREE.IcosahedronGeometry(2.0, 0);
+const wireMat = new THREE.MeshPhysicalMaterial({
+    color: 0x8888ff,
+    wireframe: true,
+    emissive: 0x6666ff,
+    emissiveIntensity: 0.4,
+    transparent: true,
+    opacity: 0.35,
+});
+const wireIco = new THREE.Mesh(wireGeo, wireMat);
+mainGroup.add(wireIco);
+
+// --- Outer detailed wireframe ---
+const outerWireGeo = new THREE.IcosahedronGeometry(2.4, 1);
+const outerWireMat = new THREE.MeshPhysicalMaterial({
+    color: 0xff66aa,
+    wireframe: true,
+    emissive: 0xff5599,
+    emissiveIntensity: 0.2,
+    transparent: true,
+    opacity: 0.15,
+});
+const outerWire = new THREE.Mesh(outerWireGeo, outerWireMat);
+mainGroup.add(outerWire);
+
+// --- Orbiting rings ---
+function createRing(radius, color, opacity, tiltX, tiltY) {
+    const geo = new THREE.TorusGeometry(radius, 0.025, 24, 80);
+    const mat = new THREE.MeshPhysicalMaterial({
+        color,
+        emissive: color,
+        emissiveIntensity: 0.5,
+        transparent: true,
+        opacity,
+        blending: THREE.AdditiveBlending,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.rotation.x = tiltX;
+    mesh.rotation.y = tiltY;
+    return mesh;
+}
+
+const ring1 = createRing(2.8, 0x6666ff, 0.5, Math.PI / 2, 0.2);
+mainGroup.add(ring1);
+const ring2 = createRing(3.2, 0xff5599, 0.35, 1.1, 0.8);
+mainGroup.add(ring2);
+const ring3 = createRing(3.6, 0x44ddff, 0.2, 0.4, 1.5);
+mainGroup.add(ring3);
+
+// --- Orbiting particles around the object ---
+const orbCount = 200;
+const orbGeo = new THREE.BufferGeometry();
+const orbPos = new Float32Array(orbCount * 3);
+const orbSizes = new Float32Array(orbCount);
+const orbColors = new Float32Array(orbCount * 3);
+const orbData = [];
+
+for (let i = 0; i < orbCount; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = 3.8 + Math.random() * 1.5;
+    orbPos[i * 3] = Math.sin(phi) * Math.cos(theta) * r;
+    orbPos[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * r;
+    orbPos[i * 3 + 2] = Math.cos(phi) * r;
+    orbSizes[i] = 0.03 + Math.random() * 0.06;
+
+    const col = new THREE.Color().setHSL(0.6 + Math.random() * 0.4, 1, 0.6);
+    orbColors[i * 3] = col.r;
+    orbColors[i * 3 + 1] = col.g;
+    orbColors[i * 3 + 2] = col.b;
+
+    orbData.push({
+        theta, phi, r,
+        speed: 0.1 + Math.random() * 0.2,
+        offset: Math.random() * Math.PI * 2,
+    });
+}
+
+orbGeo.setAttribute('position', new THREE.BufferAttribute(orbPos, 3));
+orbGeo.setAttribute('size', new THREE.BufferAttribute(orbSizes, 1));
+orbGeo.setAttribute('color', new THREE.BufferAttribute(orbColors, 3));
+
+const orbMat = new THREE.PointsMaterial({
+    size: 0.06,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.8,
+    blending: THREE.AdditiveBlending,
+    sizeAttenuation: true,
+});
+const orbPoints = new THREE.Points(orbGeo, orbMat);
+mainGroup.add(orbPoints);
+
+// ============ FLOATING SHAPES ============
+const shapes = [];
+const shapeGeos = [
+    new THREE.OctahedronGeometry(0.15, 0),
+    new THREE.TetrahedronGeometry(0.2, 0),
+    new THREE.BoxGeometry(0.12, 0.12, 0.12),
+    new THREE.DodecahedronGeometry(0.12, 0),
+];
+
+for (let i = 0; i < 50; i++) {
+    const geo = shapeGeos[i % shapeGeos.length];
+    const hue = 0.6 + Math.random() * 0.4;
+    const col = new THREE.Color().setHSL(hue, 1, 0.5);
+    const mat = new THREE.MeshPhysicalMaterial({
+        color: col,
+        emissive: col,
+        emissiveIntensity: 0.15,
+        transparent: true,
+        opacity: 0.3 + Math.random() * 0.4,
+        metalness: 0.1,
+        roughness: 0.3,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = 5 + Math.random() * 6;
+    mesh.position.set(
+        Math.sin(phi) * Math.cos(theta) * r,
+        (Math.random() - 0.5) * 8,
+        Math.cos(phi) * r
+    );
+
+    mesh.userData = {
+        rotSpeed: 0.005 + Math.random() * 0.03,
+        rotAxis: new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(),
+        floatSpeed: 0.2 + Math.random() * 0.4,
+        floatPhase: Math.random() * Math.PI * 2,
+        origPos: mesh.position.clone(),
+    };
+
+    scene.add(mesh);
+    shapes.push(mesh);
+}
+
+// ============ PARTICLES ============
+const pCount = 5000;
+const pPos = new Float32Array(pCount * 3);
+const pSizes = new Float32Array(pCount);
+const pVelocities = [];
+
+for (let i = 0; i < pCount; i++) {
+    const r = 12 + Math.random() * 25;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    pPos[i * 3] = Math.sin(phi) * Math.cos(theta) * r;
+    pPos[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * r;
+    pPos[i * 3 + 2] = Math.cos(phi) * r;
+    pSizes[i] = 0.3 + Math.random() * 1.5;
+    pVelocities.push({
+        x: (Math.random() - 0.5) * 0.0015,
+        y: (Math.random() - 0.5) * 0.0015,
+        z: (Math.random() - 0.5) * 0.0015,
+    });
+}
+
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+pGeo.setAttribute('size', new THREE.BufferAttribute(pSizes, 1));
+
+const pMat = new THREE.PointsMaterial({
+    color: 0x8888ff,
+    size: 0.04,
+    transparent: true,
+    opacity: 0.5,
+    blending: THREE.AdditiveBlending,
+    sizeAttenuation: true,
+});
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+// ============ MOUSE TRACKING ============
+let mouseX = 0, mouseY = 0;
+let targetX = 0, targetY = 0;
+let smoothX = 0, smoothY = 0;
+
+document.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+    mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+});
+
+// ============ RESIZE ============
+window.addEventListener('resize', () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+    composer.setSize(w, h);
+});
+
+// ============ ANIMATION ============
+const clock = new THREE.Clock();
+
+function animate() {
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    // Smooth mouse tracking with easing
+    targetX += (mouseX - targetX) * 0.05;
+    targetY += (mouseY - targetY) * 0.05;
+    smoothX += (targetX - smoothX) * 0.03;
+    smoothY += (targetY - smoothY) * 0.03;
+
+    // Main object rotation follows mouse
+    mainGroup.rotation.x = smoothY * 0.3 + Math.sin(t * 0.08) * 0.08;
+    mainGroup.rotation.y = smoothX * 0.4 + t * 0.12;
+    mainGroup.rotation.z = Math.sin(t * 0.04) * 0.04;
+
+    // Inner icosahedron pulse
+    const pulse = 1 + Math.sin(t * 0.6) * 0.025;
+    ico.scale.set(pulse, pulse, pulse);
+
+    // Wireframe counter-rotate slightly
+    wireIco.rotation.x = t * 0.02;
+    wireIco.rotation.y = t * 0.03;
+    outerWire.rotation.x = -t * 0.015;
+    outerWire.rotation.y = -t * 0.025;
+
+    // Rings rotate
+    ring1.rotation.z = t * 0.15 + 0.2;
+    ring2.rotation.x = t * 0.12 + 1.1;
+    ring2.rotation.y = t * 0.1 + 0.8;
+    ring3.rotation.z = -t * 0.08;
+
+    // Orbiting particles update
+    const pos = orbPoints.geometry.attributes.position.array;
+    for (let i = 0; i < orbCount; i++) {
+        const d = orbData[i];
+        const theta2 = d.theta + t * d.speed * 0.1;
+        const phi2 = d.phi + Math.sin(t * d.speed * 0.05 + d.offset) * 0.02;
+        pos[i * 3] = Math.sin(phi2) * Math.cos(theta2) * d.r;
+        pos[i * 3 + 1] = Math.sin(phi2) * Math.sin(theta2) * d.r;
+        pos[i * 3 + 2] = Math.cos(phi2) * d.r;
+    }
+    orbPoints.geometry.attributes.position.needsUpdate = true;
+
+    // Floating shapes
+    for (const mesh of shapes) {
+        mesh.rotateOnWorldAxis(mesh.userData.rotAxis, mesh.userData.rotSpeed);
+        const f = Math.sin(t * mesh.userData.floatSpeed + mesh.userData.floatPhase) * 0.2;
+        mesh.position.y = mesh.userData.origPos.y + f;
+    }
+
+    // Particles drift
+    const pp = particles.geometry.attributes.position.array;
+    for (let i = 0; i < pCount; i++) {
+        pp[i * 3] += pVelocities[i].x;
+        pp[i * 3 + 1] += pVelocities[i].y;
+        pp[i * 3 + 2] += pVelocities[i].z;
+        const radius = Math.sqrt(pp[i * 3] ** 2 + pp[i * 3 + 1] ** 2 + pp[i * 3 + 2] ** 2);
+        if (radius > 40) {
+            const nr = 12 + Math.random() * 5;
+            const t2 = Math.random() * Math.PI * 2;
+            const p2 = Math.acos(2 * Math.random() - 1);
+            pp[i * 3] = Math.sin(p2) * Math.cos(t2) * nr;
+            pp[i * 3 + 1] = Math.sin(p2) * Math.sin(t2) * nr;
+            pp[i * 3 + 2] = Math.cos(p2) * nr;
+        }
+    }
+    particles.geometry.attributes.position.needsUpdate = true;
+
+    // Camera subtle parallax
+    camera.position.x = Math.sin(t * 0.015) * 1.2 + smoothX * 1.2;
+    camera.position.y = 1.5 + Math.sin(t * 0.02) * 0.4 + smoothY * 0.8;
+    camera.lookAt(0, 0, 0);
+
+    composer.render();
+}
+
+animate();
+</script>
+</body>
+</html>
