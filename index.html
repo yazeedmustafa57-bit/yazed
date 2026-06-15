@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yazed — 3D Experiences</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #05050a;
+            color: #fff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 1rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.25);
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #e0e0ff, #8888ff, #ff66aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+
+        .sub {
+            color: rgba(255,255,255,0.5);
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            font-weight: 300;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 600px) {
+            .cards { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(136,136,255,0.3);
+            box-shadow: 0 20px 60px rgba(136,136,255,0.15);
+            background: rgba(255,255,255,0.06);
+        }
+
+        .card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.5;
+        }
+
+        .card .tag {
+            margin-top: 1.2rem;
+            font-size: 0.75rem;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            background: rgba(136,136,255,0.15);
+            color: #8888ff;
+            letter-spacing: 0.1em;
+        }
+
+        .footer {
+            margin-top: 4rem;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.2);
+        }
+
+        .footer a {
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #8888ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">✦ Yazed Studio</div>
+        <h1>3D Experiences</h1>
+        <p class="sub">Interaktive WebGL-Welten mit Three.js — erkunde Licht, Bewegung und Geometrie.</p>
+
+        <div class="cards">
+            <a href="3d-website.html" class="card">
+                <div class="icon">🌀</div>
+                <h2>3D Experience</h2>
+                <p>Schwebender Torus-Knoten mit Glow-Effekten, Partikeln und schwebenden Formen.</p>
+                <span class="tag">Three.js + Bloom</span>
+            </a>
+            <a href="dark-mode-3d.html" class="card">
+                <div class="icon">✦</div>
+                <h2>Dark Matter</h2>
+                <p>Icosahedron mit Wireframe-Doppelschalen, 5000 Partikeln und orbitalen Lichtern.</p>
+                <span class="tag">Three.js + Bloom</span>
+            </a>
+        </div>
+
+        <div class="footer">
+            <a href="https://github.com/yazeedmustafa57-bit/yazed" target="_blank">GitHub</a>
+        </div>
+    </div>
+</body>
+</html>
