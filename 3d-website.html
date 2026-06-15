@@ -6,7 +6,7 @@
     <title>3D Experience</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {  background: #0a0a0f; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { touch-action: manipulation;   background: #0a0a0f; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
 
         canvas { display: block; position: fixed; top: 0; left: 0; pointer-events: none; }
 
@@ -115,7 +115,7 @@
     
         /* Scrollable content */
         html { scroll-behavior: smooth; }
-        body { min-height: 100vh; overflow-x: hidden; }
+        body { touch-action: manipulation;  min-height: 100vh; overflow-x: hidden; }
         .overlay { pointer-events: none !important; }
         .overlay .badge, .overlay .actions { pointer-events: auto !important; }
         .scroll-content {
@@ -177,7 +177,7 @@
 </div>
 
 <div class="scroll-hint">
-    Scroll Down
+    🖱 Scroll Down · 👆 Wische seitlich zum Drehen
     <span></span>
 </div>
 
@@ -399,22 +399,28 @@ document.addEventListener('mousemove', (e) => {
     mouseX = (e.clientX / window.innerWidth) * 2 - 1;
     mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
 });
-    // Touch support for mobile
+    // Touch support for mobile (scroll-friendly)
     let touchStartX = 0, touchStartY = 0;
+    let touchActive = false;
     document.addEventListener('touchstart', (e) => {
+        touchActive = true;
         if (e.touches.length === 1) {
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
         }
     }, { passive: true });
     document.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 1) {
+        if (!touchActive || e.touches.length !== 1) return;
+        const dx = Math.abs(e.touches[0].clientX - touchStartX);
+        const dy = Math.abs(e.touches[0].clientY - touchStartY);
+        // Only rotate 3D object if horizontal movement dominates (not scrolling)
+        if (dx > dy && dx > 10) {
             mouseX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
             mouseY = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
         }
     }, { passive: true });
     document.addEventListener('touchend', () => {
-        // Smoothly return to center
+        touchActive = false;
         mouseX = 0;
         mouseY = 0;
     }, { passive: true });
