@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>EBÄKO eG // Cyber Concept</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
@@ -11,10 +12,22 @@
             overflow-x: hidden;
             overflow-y: auto;
             background: #001020;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif;
             color: #fff;
             touch-action: manipulation;
         }
+        :root {
+            --cyan: #009FE3;
+            --blue-dark: #004070;
+            --bg-dark: #001020;
+            --neon: #00f0ff;
+        }
+        a { color: var(--cyan); text-decoration: none; }
+        a:hover { color: var(--neon); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 3px; }
+
         canvas {
             display: block;
             position: fixed;
@@ -23,27 +36,74 @@
             z-index: 1;
         }
 
-        /* -- Scanline overlay -- */
+        /* Overlays */
         .screen-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 2;
-            background:
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,159,227,0.03) 2px, rgba(0,159,227,0.03) 4px);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 2;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,159,227,0.025) 2px, rgba(0,159,227,0.025) 4px);
             mix-blend-mode: overlay;
         }
         .vignette {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 2;
-            background: radial-gradient(ellipse at center, transparent 60%, rgba(0,16,32,0.6) 100%);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 2;
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(0,16,32,0.7) 100%);
+        }
+        .glitch-flash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 3;
+            opacity: 0;
+            background: linear-gradient(135deg, rgba(0,159,227,0.04), rgba(0,240,255,0.03));
+            animation: flashRand 12s ease-in-out infinite;
+        }
+        @keyframes flashRand {
+            0%, 95%, 100% { opacity: 0; }
+            96% { opacity: 0.4; }
+            97% { opacity: 0; }
+            98% { opacity: 0.15; }
+            99% { opacity: 0; }
         }
 
-        /* -- Hero Content -- */
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 20;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(0,16,32,0.9) 0%, transparent 100%);
+            backdrop-filter: blur(12px);
+            pointer-events: auto;
+        }
+        .nav-logo svg { height: 28px; fill: var(--cyan); filter: drop-shadow(0 0 15px rgba(0,159,227,0.3)); }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .nav-links a {
+            color: rgba(255,255,255,0.4);
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--cyan); }
+        @media (max-width: 700px) {
+            .nav-links { display: none; }
+        }
+        .nav-hamburger {
+            display: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+        @media (max-width: 700px) {
+            .nav-hamburger { display: block; }
+        }
+
+        /* Hero */
         .hero {
             position: relative;
             z-index: 5;
@@ -57,34 +117,35 @@
             pointer-events: none;
         }
         .hero-logo {
-            width: 100px;
-            margin-bottom: 1.5rem;
-            filter: drop-shadow(0 0 30px rgba(0,159,227,0.4));
-            animation: fadeUp 1.2s ease-out 0.3s both;
+            width: 90px;
+            margin-bottom: 1.2rem;
+            filter: drop-shadow(0 0 40px rgba(0,159,227,0.3));
+            animation: fadeUp 1.2s ease-out 0.2s both;
         }
-        .hero-logo svg path { fill: #009FE3; }
+        .hero-logo svg { width: 100%; display: block; }
+        .hero-logo svg :is(path, polygon) { fill: var(--cyan); }
         .hero-tag {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             letter-spacing: 0.8em;
             text-transform: uppercase;
-            color: rgba(0,159,227,0.5);
-            margin-bottom: 0.5rem;
+            color: rgba(0,159,227,0.4);
+            margin-bottom: 0.4rem;
             animation: fadeUp 1.2s ease-out 0.4s both;
-            text-shadow: 0 0 20px rgba(0,159,227,0.2);
+            text-shadow: 0 0 20px rgba(0,159,227,0.15);
         }
         .hero h1 {
-            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-size: clamp(2.2rem, 7vw, 5.5rem);
             font-weight: 800;
             letter-spacing: -0.03em;
             text-align: center;
             line-height: 1.05;
-            background: linear-gradient(135deg, #009FE3, #00ffff, #009FE3, #004070, #009FE3);
+            background: linear-gradient(135deg, var(--cyan), var(--neon), var(--cyan), var(--blue-dark), var(--cyan));
             background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: gradShift 5s ease-in-out infinite, fadeUp 1s ease-out 0.6s both;
-            filter: drop-shadow(0 0 60px rgba(0,159,227,0.15));
+            filter: drop-shadow(0 0 60px rgba(0,159,227,0.1));
         }
         @keyframes gradShift {
             0% { background-position: 0% 50%; }
@@ -92,48 +153,59 @@
             100% { background-position: 0% 50%; }
         }
         .hero-sub {
-            font-size: clamp(0.8rem, 1.2vw, 1.1rem);
-            color: rgba(0,255,255,0.35);
+            font-size: clamp(0.7rem, 1.1vw, 1rem);
+            color: rgba(0,240,255,0.3);
             margin-top: 1rem;
             font-weight: 300;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.25em;
             text-align: center;
-            max-width: 600px;
+            max-width: 700px;
             animation: fadeUp 1s ease-out 0.8s both;
-            text-shadow: 0 0 30px rgba(0,255,255,0.1);
+            text-shadow: 0 0 30px rgba(0,240,255,0.05);
         }
         .hero-cta {
-            margin-top: 2.5rem;
+            margin-top: 2rem;
             pointer-events: auto;
             animation: fadeUp 1s ease-out 1s both;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .hero-cta a {
             display: inline-block;
-            padding: 0.8rem 2.5rem;
-            border: 1px solid rgba(0,159,227,0.3);
+            padding: 0.7rem 2rem;
+            border: 1px solid rgba(0,159,227,0.25);
             border-radius: 50px;
-            color: #009FE3;
+            color: var(--cyan);
             text-decoration: none;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             letter-spacing: 0.15em;
             transition: all 0.4s;
             background: rgba(0,159,227,0.05);
             backdrop-filter: blur(10px);
         }
         .hero-cta a:hover {
-            background: rgba(0,159,227,0.15);
-            border-color: #009FE3;
-            box-shadow: 0 0 40px rgba(0,159,227,0.2);
+            background: rgba(0,159,227,0.12);
+            border-color: var(--cyan);
+            box-shadow: 0 0 40px rgba(0,159,227,0.15);
             transform: translateY(-2px);
         }
-        .hero-scroll-hint {
+        .hero-cta a.primary {
+            background: rgba(0,159,227,0.15);
+            border-color: var(--cyan);
+        }
+        .hero-cta a.primary:hover {
+            background: rgba(0,159,227,0.25);
+        }
+        .scroll-hint {
             position: absolute;
             bottom: 2rem;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             letter-spacing: 0.3em;
-            color: rgba(0,159,227,0.25);
+            color: rgba(0,159,227,0.2);
             animation: bounceHint 2s ease-in-out infinite;
         }
         @keyframes bounceHint {
@@ -141,138 +213,292 @@
             50% { transform: translateX(-50%) translateY(8px); }
         }
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(25px); }
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* -- Scroll Content -- */
-        .scroll-content {
+        /* Scroll Content */
+        .content-wrap {
             position: relative;
             z-index: 5;
             margin-top: 100vh;
-            padding: 5rem 2rem 6rem;
-            background: rgba(0,16,32,0.95);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(0,159,227,0.08);
         }
-        .scroll-inner {
-            max-width: 1000px;
+        .section {
+            padding: 5rem 2rem;
+            background: rgba(0,16,32,0.95);
+            backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(0,159,227,0.06);
+        }
+        .section:first-child { border-top: none; }
+        .section-inner {
+            max-width: 1100px;
             margin: 0 auto;
         }
+        .section-label {
+            font-size: 0.55rem;
+            letter-spacing: 0.6em;
+            text-transform: uppercase;
+            color: rgba(0,159,227,0.3);
+            margin-bottom: 0.3rem;
+        }
         .section-title {
-            font-size: 1.6rem;
+            font-size: clamp(1.4rem, 2.5vw, 2.2rem);
             font-weight: 700;
             margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #009FE3, #00ffff);
+            background: linear-gradient(135deg, var(--cyan), var(--neon));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .section-sub {
+        .section-desc {
             font-size: 0.9rem;
-            color: rgba(255,255,255,0.3);
-            margin-bottom: 3rem;
-            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.35);
+            max-width: 700px;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
         }
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1.5rem;
+
+        /* Grids */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+        @media (max-width: 800px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
         }
-        @media (max-width: 700px) {
-            .grid-3 { grid-template-columns: 1fr; }
+        @media (min-width: 801px) and (max-width: 1100px) {
+            .grid-4 { grid-template-columns: 1fr 1fr; }
         }
+
+        /* Cards */
         .card {
             padding: 2rem;
             border-radius: 16px;
-            border: 1px solid rgba(0,159,227,0.1);
-            background: rgba(0,159,227,0.03);
+            border: 1px solid rgba(0,159,227,0.08);
+            background: rgba(0,159,227,0.02);
             backdrop-filter: blur(10px);
             transition: all 0.4s;
         }
         .card:hover {
-            border-color: rgba(0,159,227,0.3);
-            transform: translateY(-4px);
-            box-shadow: 0 0 40px rgba(0,159,227,0.05);
+            border-color: rgba(0,159,227,0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 0 40px rgba(0,159,227,0.03);
         }
-        .card .icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+        .card .icon { font-size: 1.5rem; margin-bottom: 0.8rem; }
         .card h3 {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            margin-bottom: 0.6rem;
-            color: #00ffff;
+            margin-bottom: 0.5rem;
+            color: var(--neon);
         }
         .card p {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.45);
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
             line-height: 1.6;
         }
+        .card .meta {
+            font-size: 0.65rem;
+            color: rgba(0,159,227,0.3);
+            margin-top: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* News row */
+        .news-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0,159,227,0.06);
+            background: rgba(0,159,227,0.015);
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+        .news-item:hover { border-color: rgba(0,159,227,0.15); }
+        .news-item .date {
+            font-size: 0.65rem;
+            color: rgba(0,159,227,0.3);
+            letter-spacing: 0.1em;
+        }
+        .news-item h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: #e0e8ff;
+        }
+        .news-item p {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+            line-height: 1.5;
+        }
+        .news-item img {
+            width: 100%;
+            border-radius: 8px;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+        @media (max-width: 600px) {
+            .news-item { grid-template-columns: 1fr; }
+        }
+
+        /* Testimonial */
+        .testimonial {
+            padding: 2.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(0,159,227,0.08);
+            background: rgba(0,159,227,0.02);
+            text-align: center;
+        }
+        .testimonial blockquote {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.6);
+            font-style: italic;
+            max-width: 700px;
+            margin: 0 auto 1.5rem;
+        }
+        .testimonial blockquote::before { content: '"'; color: var(--cyan); font-size: 2rem; }
+        .testimonial blockquote::after { content: '"'; color: var(--cyan); font-size: 2rem; }
+        .testimonial cite {
+            font-size: 0.8rem;
+            color: var(--cyan);
+            font-style: normal;
+            letter-spacing: 0.05em;
+        }
+
+        /* Team / Contacts */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .team-card {
+            padding: 1.2rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0,159,227,0.06);
+            background: rgba(0,159,227,0.015);
+            transition: all 0.3s;
+        }
+        .team-card:hover { border-color: rgba(0,159,227,0.15); }
+        .team-card .name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e0e8ff;
+        }
+        .team-card .role {
+            font-size: 0.7rem;
+            color: var(--cyan);
+            margin: 0.2rem 0 0.5rem;
+            letter-spacing: 0.05em;
+        }
+        .team-card .contact {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.35);
+            line-height: 1.6;
+        }
+        .team-card .contact a { color: rgba(0,159,227,0.5); }
+        .team-card .contact a:hover { color: var(--neon); }
+        .team-group-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(0,159,227,0.25);
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(0,159,227,0.06);
+        }
+
+        /* Stats */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-            margin-top: 3rem;
-            padding-top: 3rem;
-            border-top: 1px solid rgba(0,159,227,0.06);
+            gap: 2rem;
+            margin-top: 2rem;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(0,159,227,0.06);
+            background: rgba(0,159,227,0.015);
         }
         @media (max-width: 600px) {
             .stats-row { grid-template-columns: repeat(2, 1fr); }
         }
-        .stat {
-            text-align: center;
-        }
+        .stat { text-align: center; }
         .stat-num {
             font-size: 2rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #009FE3, #00ffff);
+            background: linear-gradient(135deg, var(--cyan), var(--neon));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
         .stat-label {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.3);
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.25);
             letter-spacing: 0.1em;
-            margin-top: 0.3rem;
+            margin-top: 0.2rem;
         }
 
-        .footer-bar {
-            margin-top: 4rem;
-            padding-top: 2rem;
+        /* Vision */
+        .vision-block {
+            padding: 3rem;
+            border-radius: 16px;
+            border: 1px solid rgba(0,159,227,0.1);
+            background: linear-gradient(135deg, rgba(0,159,227,0.05), transparent);
+            text-align: center;
+        }
+        .vision-block .quote {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.55);
+            max-width: 700px;
+            margin: 0 auto;
+            font-style: italic;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 3rem 2rem;
             border-top: 1px solid rgba(0,159,227,0.06);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            font-size: 0.75rem;
+            background: rgba(0,10,20,0.98);
+        }
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 700px) {
+            .footer-inner { grid-template-columns: 1fr 1fr; }
+        }
+        .footer h4 {
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
             color: rgba(255,255,255,0.2);
+            margin-bottom: 1rem;
         }
-        .footer-bar a {
-            color: rgba(0,159,227,0.4);
-            text-decoration: none;
+        .footer p, .footer a {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.25);
+            line-height: 1.8;
         }
-        .footer-bar a:hover { color: #009FE3; }
-        .footer-links { display: flex; gap: 1.5rem; }
-
-        /* Glitch flash */
-        .glitch-flash {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 3;
-            opacity: 0;
-            background: linear-gradient(135deg, rgba(0,159,227,0.06), rgba(0,255,255,0.04));
-            animation: flashRand 10s ease-in-out infinite;
+        .footer a:hover { color: var(--cyan); }
+        .footer .social { display: flex; gap: 0.8rem; margin-top: 0.5rem; }
+        .footer .social a { opacity: 0.3; }
+        .footer .social a:hover { opacity: 0.8; }
+        .footer .social img { width: 20px; height: 20px; }
+        .footer-bottom {
+            max-width: 1100px;
+            margin: 2rem auto 0;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0,159,227,0.04);
+            text-align: center;
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.12);
         }
-        @keyframes flashRand {
-            0%, 94%, 100% { opacity: 0; }
-            95% { opacity: 0.5; }
-            96% { opacity: 0; }
-            97% { opacity: 0.2; }
-            98% { opacity: 0; }
-        }
+        .footer-bottom a { color: rgba(0,159,227,0.2); }
+        .footer-bottom a:hover { color: var(--cyan); }
     </style>
 </head>
 <body>
@@ -281,6 +507,27 @@
 <div class="vignette"></div>
 <div class="glitch-flash"></div>
 
+<!-- Nav -->
+<nav class="nav">
+    <a href="#" class="nav-logo">
+        <svg viewBox="0 0 286.6 345.5" xmlns="http://www.w3.org/2000/svg">
+            <path d="M143.3,24.9c-30.9,0-56.1-7.2-56.1-7.2v112.5h112.1V17.7C199.4,17.7,174.2,24.9,143.3,24.9z M137.6,97.2c1.1,0,2.1,1,2.1,2.1c0,1.2-0.9,2.1-2.1,2.1s-2.1-1-2.1-2.1C135.5,98.2,136.5,97.2,137.6,97.2z M121.1,97.2c1.1,0,2.1,1,2.1,2.1c0,1.2-0.9,2.1-2.1,2.1c-1.1,0-2.1-1-2.1-2.1C119,98.2,119.9,97.2,121.1,97.2z M105.8,123H94.2V97.2h10.3c4.6,0,9,1.3,9,6.2c0,3.6-2.6,5-2.6,5c2.8,1,5.2,3.6,5.2,7.3C116,121.1,111.1,123,105.8,123z M135,123l-1.3-4.5h-8.5l-1.4,4.5h-7.7l9.4-25.9h7.7l9.5,25.9H135z M160,123l-8.4-11v11h-7.3V97.2h7.3V108l7.9-10.8h9.1l-10.3,12.7l11,13.2H160z M179.8,123.6c-8.1,0-13.5-6.3-13.5-13.7s5.9-13.6,13.5-13.6c7.6,0,13.6,6.1,13.6,13.5C193.3,118.1,187,123.6,179.8,123.6z"/>
+            <path d="M282.5,1.2c-0.3,0.1-19,5.2-47.7,9.9v6.6c21.8-3.5,38.1-7.4,45.3-9.2v273.6H6.5V8.6c7.2,1.8,23.4,5.7,45.3,9.2v-6.6C23,6.5,4.5,1.3,4.2,1.2L0,0v288.7h286.6V0L282.5,1.2z"/>
+        </svg>
+    </a>
+    <ul class="nav-links">
+        <li><a href="#news">News</a></li>
+        <li><a href="#ueber-uns">Über uns</a></li>
+        <li><a href="#leistungen">Leistungen</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#stimmen">Stimmen</a></li>
+        <li><a href="#karriere">Karriere</a></li>
+        <li><a href="https://www.ebaeko.de" target="_blank">Original →</a></li>
+    </ul>
+    <div class="nav-hamburger">☰</div>
+</nav>
+
+<!-- Hero -->
 <section class="hero">
     <div class="hero-logo">
         <svg viewBox="0 0 286.6 345.5" xmlns="http://www.w3.org/2000/svg">
@@ -289,75 +536,397 @@
                     <path d="M190.4,234.2l18.7-22.9h-16.4l-14.4,19.6v-19.6h-13.2v46.9h13.2v-20l15.2,20h16.8L190.4,234.2z M104.4,231.6c0,0,4.6-2.6,4.6-9.1c0-8.9-7.9-11.3-16.2-11.3H74.2v46.9h21c9.6,0,18.6-3.5,18.6-13.4C113.8,238.1,109.4,233.3,104.4,231.6z M86.7,219.8h4.1c4.1,0,7.4,1.1,7.4,4.7c0,3.9-2.5,4.9-7.1,4.9h-4.5V219.8z M91.3,248.9h-4.6v-11.3h5c6.6,0,8.2,2.8,8.2,5.6S97.8,248.9,91.3,248.9z M144.9,211.3H131l-17,46.9h13.9l2.5-8.2h15.4l2.4,8.2h13.8L144.9,211.3z M133.4,239.9l4.6-16.6l4.8,16.6H133.4z M229.3,209.7c-13.8,0-24.4,11.2-24.4,24.6s9.9,24.8,24.5,24.8c13.1,0,24.6-10,24.6-25C254,220.7,243.1,209.7,229.3,209.7z M229.6,247.6c-6.8,0-13.1-5.2-13.1-13.1c0-7.4,5.8-13.2,13.1-13.2s13,5.7,13,12.8C242.6,242.1,236.6,247.6,229.6,247.6z M123,211.4c-2.1,0-3.8,1.7-3.8,3.8s1.7,3.8,3.8,3.8s3.8-1.7,3.8-3.8S125.1,211.4,123,211.4z M152.9,211.4c-2.1,0-3.8,1.7-3.8,3.8s1.7,3.8,3.8,3.8s3.8-1.7,3.8-3.8S155,211.4,152.9,211.4z"/>
                     <path d="M68.9,219.7v-8.5H34.7v46.9h34.2v-9.8H48.6v-10.7h16.7V229H48.6v-9.3L68.9,219.7z"/>
                 </g>
-                <g>
-                    <path d="M103.8,111.7h-2.8v6.2h2.6c3.6,0,4.8-1.5,4.8-3.1C108.4,113.2,107.5,111.7,103.8,111.7z"/>
-                    <polygon points="126.8,113 132,113 129.4,103.8"/>
-                    <path d="M107.4,104.5c0-2-1.9-2.6-4.1-2.6h-2.3v5.3h2.5C106,107.1,107.4,106.6,107.4,104.5z"/>
-                    <path d="M179.9,102.7c-4,0-7.2,3.2-7.2,7.3c0,4.4,3.5,7.2,7.2,7.2c3.9,0,7.2-3.1,7.2-7.4C187.1,105.9,183.9,102.7,179.9,102.7z"/>
-                    <path d="M143.3,24.9c-30.9,0-56.1-7.2-56.1-7.2v112.5h112.1V17.7C199.4,17.7,174.2,24.9,143.3,24.9z M137.6,97.2c1.1,0,2.1,1,2.1,2.1c0,1.2-0.9,2.1-2.1,2.1s-2.1-1-2.1-2.1C135.5,98.2,136.5,97.2,137.6,97.2z M121.1,97.2c1.1,0,2.1,1,2.1,2.1c0,1.2-0.9,2.1-2.1,2.1c-1.1,0-2.1-1-2.1-2.1C119,98.2,119.9,97.2,121.1,97.2z M105.8,123H94.2V97.2h10.3c4.6,0,9,1.3,9,6.2c0,3.6-2.6,5-2.6,5c2.8,1,5.2,3.6,5.2,7.3C116,121.1,111.1,123,105.8,123z M135,123l-1.3-4.5h-8.5l-1.4,4.5h-7.7l9.4-25.9h7.7l9.5,25.9H135z M160,123l-8.4-11v11h-7.3V97.2h7.3V108l7.9-10.8h9.1l-10.3,12.7l11,13.2H160z M179.8,123.6c-8.1,0-13.5-6.3-13.5-13.7s5.9-13.6,13.5-13.6c7.6,0,13.6,6.1,13.6,13.5C193.3,118.1,187,123.6,179.8,123.6z"/>
-                </g>
+                <path d="M143.3,24.9c-30.9,0-56.1-7.2-56.1-7.2v112.5h112.1V17.7C199.4,17.7,174.2,24.9,143.3,24.9z M137.6,97.2c1.1,0,2.1,1,2.1,2.1c0,1.2-0.9,2.1-2.1,2.1s-2.1-1-2.1-2.1C135.5,98.2,136.5,97.2,137.6,97.2z M121.1,97.2c1.1,0,2.1,1,2.1,2.1c0,1.2-0.9,2.1-2.1,2.1c-1.1,0-2.1-1-2.1-2.1C119,98.2,119.9,97.2,121.1,97.2z M105.8,123H94.2V97.2h10.3c4.6,0,9,1.3,9,6.2c0,3.6-2.6,5-2.6,5c2.8,1,5.2,3.6,5.2,7.3C116,121.1,111.1,123,105.8,123z M135,123l-1.3-4.5h-8.5l-1.4,4.5h-7.7l9.4-25.9h7.7l9.5,25.9H135z M160,123l-8.4-11v11h-7.3V97.2h7.3V108l7.9-10.8h9.1l-10.3,12.7l11,13.2H160z M179.8,123.6c-8.1,0-13.5-6.3-13.5-13.7s5.9-13.6,13.5-13.6c7.6,0,13.6,6.1,13.6,13.5C193.3,118.1,187,123.6,179.8,123.6z"/>
                 <path d="M282.5,1.2c-0.3,0.1-19,5.2-47.7,9.9v6.6c21.8-3.5,38.1-7.4,45.3-9.2v273.6H6.5V8.6c7.2,1.8,23.4,5.7,45.3,9.2v-6.6C23,6.5,4.5,1.3,4.2,1.2L0,0v288.7h286.6V0L282.5,1.2z"/>
             </g>
         </svg>
     </div>
-    <div class="hero-tag">✦ Genossenschaft der Bäckereien</div>
-    <h1>EBÄKO//<br />CYBER</h1>
-    <p class="hero-sub">VERLÄSSLICHER PARTNER FÜR BÄCKEREIEN · KONDITOREIEN · CAFÉS IM RAUM WESER-EMS-MITTE</p>
-    <div class="hero-cta"><a href="#">✦ ENTDECKEN</a></div>
-    <div class="hero-scroll-hint">SCROLL ▼</div>
+    <div class="hero-tag">✦ Genossenschaft der Bäckereien seit 1924</div>
+    <h1>EBÄKO//<br />CYBERPUNK</h1>
+    <p class="hero-sub">VERLÄSSLICHER PARTNER FÜR BÄCKEREIEN · KONDITOREIEN · CAFÉS · WESER-EMS-MITTE</p>
+    <div class="hero-cta">
+        <a href="#news" class="primary">✦ News entdecken</a>
+        <a href="#leistungen">Leistungen →</a>
+    </div>
+    <div class="scroll-hint">SCROLL ▼</div>
 </section>
 
-<section class="scroll-content">
-    <div class="scroll-inner">
-        <div class="section-title">// UNSERE WELT</div>
-        <div class="section-sub">MITGLIEDER · SERVICE · VORTEILE</div>
+<div class="content-wrap">
+
+<!-- News -->
+<section class="section" id="news">
+    <div class="section-inner">
+        <div class="section-label">// Aktuelle Meldungen</div>
+        <div class="section-title">News &amp; Events</div>
+        <div class="section-desc">Aktuelles aus der EBÄKO eG und dem backenden Handwerk.</div>
+
+        <div class="news-item">
+            <img src="https://www.ebaeko.de/wp-content/uploads/2026/06/Baeko-2021-07-07-116-scaled.jpg" alt="Mehlsiloanlagen Prüfung" loading="lazy" onerror="this.style.display='none'" />
+            <div>
+                <div class="date">2026</div>
+                <h3>Neu im Angebot: Prüfung von Mehlsiloanlagen</h3>
+                <p>Unser Technischer Kundendienst in Oldenburg erweitert sein Leistungsspektrum: Ab sofort bieten wir auch die Prüfung von Mehlsiloanlagen in Bäckereibetrieben an.</p>
+                <div class="meta">Zum Artikel →</div>
+            </div>
+        </div>
+
+        <div class="news-item">
+            <img src="https://www.ebaeko.de/wp-content/uploads/2025/12/Messebild-Website.jpg" alt="RegioBack 2026" loading="lazy" onerror="this.style.display='none'" />
+            <div>
+                <div class="date">Februar 2026</div>
+                <h3>RegioBack 2026: Erfolgreiche Premiere</h3>
+                <p>Mit der RegioBack 2026 haben die EBÄKO und die BÄKO WEST erstmals eine gemeinsame Fachmesse auf die Beine gestellt – und das mit großem Erfolg. Mehr als 3.000 Besucher:innen nutzten die Gelegenheit, sich bei rund 230 Ausstellern auf insgesamt 9.000 Quadratmetern über Trends und Lösungen für das backende Handwerk zu informieren.</p>
+                <div class="meta">Zum Artikel →</div>
+            </div>
+        </div>
+
+        <div style="text-align:right;margin-top:0.5rem">
+            <a href="https://www.ebaeko.de/news/" target="_blank" style="font-size:0.75rem;letter-spacing:0.1em;">Alle Artikel ansehen →</a>
+        </div>
+    </div>
+</section>
+
+<!-- Vision -->
+<section class="section" id="vision" style="padding-top:2rem">
+    <div class="section-inner">
+        <div class="vision-block">
+            <div class="section-label" style="margin-bottom:0.5rem;">// Unsere Vision</div>
+            <div class="quote">« Wir bieten dem backenden Handwerk zukunftsweisende Produkte, Dienstleistungen und Lösungen. Gemeinsam festigen wir unsere erfolgreiche Position im Markt. »</div>
+        </div>
+    </div>
+</section>
+
+<!-- Über uns -->
+<section class="section" id="ueber-uns">
+    <div class="section-inner">
+        <div class="section-label">// Über uns</div>
+        <div class="section-title">Warum die EBÄKO eine gute Wahl ist</div>
+        <div class="section-desc">Als Genossenschaft sind wir verlässlicher Partner für Bäckereien, Konditoreien, Cafés und lebensmittelverarbeitende Betriebe im Raum vom nördlichen Teil Nordrhein-Westfalens bis zu den ostfriesischen Inseln und von der Ems bis Braunschweig, Göttingen und Magdeburg.</div>
 
         <div class="grid-3">
             <div class="card">
-                <div class="icon">🥖</div>
-                <h3>Rohstoffe &amp; Zutaten</h3>
-                <p>Hochwertige Mehle, Vormischungen und Backzutaten — von erfahrenen Genossenschaftern für die Region.</p>
+                <div class="icon">🏆</div>
+                <h3>100+ Jahre Erfahrung</h3>
+                <p>Durch mehr als 100 Jahre Erfahrung am Markt wissen wir, was für die handwerkliche oder industrielle Produktion hochwertiger Backwaren wichtig ist.</p>
             </div>
             <div class="card">
-                <div class="icon">⚙️</div>
-                <h3>Technik &amp; Service</h3>
-                <p>Modernste Backtechnik, Wartung und Beratung aus einer Hand. Damit Ihre Produktion rund läuft.</p>
+                <div class="icon">👥</div>
+                <h3>Qualifizierte Beratung</h3>
+                <p>Unsere qualifizierten Mitarbeiterinnen und Mitarbeiter beraten Sie gerne, helfen, Probleme zu lösen und stehen als Ratgeber zur Verfügung.</p>
             </div>
             <div class="card">
-                <div class="icon">📦</div>
-                <h3>Logistik &amp; Lieferung</h3>
-                <p>Zuverlässige Versorgung mit täglichen Touren im gesamten Raum Weser-Ems-Mitte.</p>
+                <div class="icon">🤝</div>
+                <h3>Genossenschaftsmodell</h3>
+                <p>Als Genossenschaft sind unsere Mitglieder zugleich Eigentümer – wir arbeiten gemeinsam für den Erfolg aller.</p>
             </div>
         </div>
 
         <div class="stats-row">
             <div class="stat">
-                <div class="stat-num">+100</div>
-                <div class="stat-label">MITGLIEDER</div>
+                <div class="stat-num">100+</div>
+                <div class="stat-label">JAHRE ERFAHRUNG</div>
             </div>
             <div class="stat">
-                <div class="stat-num">80+</div>
-                <div class="stat-label">JAHREN<br />ERFAHRUNG</div>
+                <div class="stat-num">500+</div>
+                <div class="stat-label">MITGLIEDERBETRIEBE</div>
             </div>
             <div class="stat">
-                <div class="stat-num">5.000+</div>
-                <div class="stat-label">PRODUKTE</div>
+                <div class="stat-num">230+</div>
+                <div class="stat-label">AUSSTELLER REGIOBACK</div>
             </div>
             <div class="stat">
-                <div class="stat-num">24/7</div>
-                <div class="stat-label">LIEFERUNG</div>
-            </div>
-        </div>
-
-        <div class="footer-bar">
-            <span>// EBÄKO eG — CYBER CONCEPT DEMO</span>
-            <div class="footer-links">
-                <a href="https://www.ebaeko.de" target="_blank">Original-Seite →</a>
-                <a href="https://github.com/yazeedmustafa57-bit" target="_blank">GitHub</a>
+                <div class="stat-num">9.000</div>
+                <div class="stat-label">M² MESSEFLÄCHE</div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- Leistungen -->
+<section class="section" id="leistungen">
+    <div class="section-inner">
+        <div class="section-label">// Unsere Leistungen</div>
+        <div class="section-title">Wir liefern die besten Zutaten</div>
+        <div class="section-desc">Ob Produkt oder Dienstleistung – wir haben alles, was Sie zur Herstellung und Vermarktung Ihrer Backwaren oder Konditoreiprodukte benötigen.</div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="icon">🥖</div>
+                <h3>Produkte &amp; Sortiment</h3>
+                <p>Alles, was Sie zur Herstellung und Vermarktung Ihrer Backwaren benötigen, finden Sie in unserem Vollsortiment – Rohstoffe, Handelswaren, Betriebsstoffe und Bäckereitechnik.</p>
+                <div class="meta">Rohstoffe · Vormischungen · Betriebsstoffe · Technik</div>
+            </div>
+            <div class="card">
+                <div class="icon">💡</div>
+                <h3>Beratung &amp; Service</h3>
+                <p>Energieeffizienz, Bäckereiplanung, anwendungstechnische und lebensmittelrechtliche Beratung, Verkaufsförderung und Hygiene – durch unser starkes Netzwerk unterstützen wir Sie.</p>
+                <div class="meta">Energieeffizienz · Planung · Hygiene · Recht</div>
+            </div>
+            <div class="card">
+                <div class="icon">⚙️</div>
+                <h3>Technik &amp; Maschinen</h3>
+                <p>Planung, Beschaffung und Instandhaltung von Bäckereimaschinen, Kältetechnik und Filialausstattung. Profitieren Sie vom Know-how unserer Berater für Investitionsgüter und unserem technischen Kundendienst.</p>
+                <div class="meta">Maschinen · Kältetechnik · TKD · Gebrauchtmaschinen</div>
+            </div>
+            <div class="card">
+                <div class="icon">🚚</div>
+                <h3>Logistik &amp; Lieferung</h3>
+                <p>Wir sind Profis bei Lagerung, Bereitstellung und Lieferung Ihrer Waren. Temperaturgeführte Belieferung und Einhaltung des IFS-Logistik-Standards bedeuten höchste Produktsicherheit.</p>
+                <div class="meta">IFS-Standard · Temperaturgeführt · Prozessoptimierung</div>
+            </div>
+        </div>
+
+        <div class="grid-3" style="margin-top:2rem">
+            <div class="card" style="text-align:center;padding:1.5rem">
+                <div class="icon">📋</div>
+                <h3 style="font-size:0.85rem">Gebrauchtmaschinen</h3>
+                <p style="font-size:0.75rem">Alle Gebrauchtmaschinen sind durch den technischen Kundendienst überholt worden. Garantie auf alle aufgeführten Artikel.</p>
+            </div>
+            <div class="card" style="text-align:center;padding:1.5rem">
+                <div class="icon">🎓</div>
+                <h3 style="font-size:0.85rem">Seminare &amp; Workshops</h3>
+                <p style="font-size:0.75rem">Fortbildungen für das backende Handwerk – auch für Auszubildende.</p>
+            </div>
+            <div class="card" style="text-align:center;padding:1.5rem">
+                <div class="icon">💳</div>
+                <h3 style="font-size:0.85rem">BÄKO Pay &amp; Digital</h3>
+                <p style="font-size:0.75rem">BackOffice Digital, BÄKO-eLEARN, BÄKO HIN/T und Bestell-App für Ihren Betrieb.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team / Contacts -->
+<section class="section" id="team">
+    <div class="section-inner">
+        <div class="section-label">// Ihre Ansprechpartner</div>
+        <div class="section-title">Immer passend beraten</div>
+        <div class="section-desc">Unsere Experten in Braunschweig, Oldenburg, Bielefeld und Münster.</div>
+
+        <!-- Oldenburg -->
+        <div class="team-group-label">Standort Oldenburg &amp; Braunschweig</div>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="name">Verkauf Innendienst</div>
+                <div class="role">Braunschweig</div>
+                <div class="contact">Tel: 0531 701370 255<br/>verkauf-bs@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Verkauf Innendienst</div>
+                <div class="role">Oldenburg</div>
+                <div class="contact">Tel: 0441 9711 255<br/>verkauf-ol@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Volker Garrels</div>
+                <div class="role">Fachberatung</div>
+                <div class="contact">Tel: 0441 9711 245<br/>volker.garrels@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Matthias Bantel</div>
+                <div class="role">Betriebsberatung (Hygiene, Arbeitsschutz)</div>
+                <div class="contact">Tel: 0160 880 3797<br/>matthias.bantel@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Holger Klarmann</div>
+                <div class="role">Rechnungswesen – Fakturierung</div>
+                <div class="contact">Tel: 0441 9711 164<br/>holger.klarmann@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Lea Hoppe</div>
+                <div class="role">Rechnungswesen – Debitorenbuchhaltung</div>
+                <div class="contact">Tel: 0441 9711 141<br/>lea.hoppe@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Katrin Neumann</div>
+                <div class="role">Rechnungswesen – Finanzierungen</div>
+                <div class="contact">Tel: 0441 9711 169<br/>katrin.neumann@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Sabine Geuting</div>
+                <div class="role">BackBüro + Bestell-App</div>
+                <div class="contact">Tel: 0251 7189 144<br/>sabine.geuting@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Technischer Kundendienst</div>
+                <div class="role">Kundendienst / Dispo</div>
+                <div class="contact">Tel: 0441 9711 235<br/>dispo-werkstatt@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Technischer Kundendienst</div>
+                <div class="role">Ersatzteile</div>
+                <div class="contact">Tel: 0441 9711 238<br/>ersatzteile@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">TKD Angebote &amp; Rechnungen</div>
+                <div class="role">Werkstatt</div>
+                <div class="contact">Tel: 0441 9711 235<br/>werkstatt@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Oliver Gebel</div>
+                <div class="role">Qualitätsmanagement</div>
+                <div class="contact">Tel: 0441 9711 278<br/>oliver.gebel@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Bernd Mönnich</div>
+                <div class="role">Maschinen und Geräte</div>
+                <div class="contact">Tel: 0441 9711 223<br/>bernd.moennich@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Andreas Niemeyer</div>
+                <div class="role">Maschinen und Geräte</div>
+                <div class="contact">Tel: 0441 9711 228<br/>andreas.niemeyer@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Ralf Tuitje</div>
+                <div class="role">Kleingeräte</div>
+                <div class="contact">Tel: 0441 9711 222<br/>ralf.tuitje@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Birgit von Deetzen</div>
+                <div class="role">Kleingeräte</div>
+                <div class="contact">Tel: 0441 9711 224<br/>birgit.vondeetzen@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Thomas Seffer</div>
+                <div class="role">Investitionsgüterberatung – Braunschweig</div>
+                <div class="contact">Tel: 0160 90629519<br/>thomas.seffer@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Günter Schute</div>
+                <div class="role">Investitionsgüterberatung – Oldenburg</div>
+                <div class="contact">Tel: 0172 2708119<br/>guenter.schute@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Silke Cordes</div>
+                <div class="role">Seminare</div>
+                <div class="contact">Tel: 0441 9711 148<br/>seminare@ebaeko.de</div>
+            </div>
+        </div>
+
+        <!-- Bielefeld / Münster -->
+        <div class="team-group-label" style="margin-top:2.5rem">Standort Bielefeld &amp; Münster</div>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="name">Verkauf Innendienst</div>
+                <div class="role">Bielefeld</div>
+                <div class="contact">Tel: 0521 29902 255<br/>verkauf-bi@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Verkauf Innendienst</div>
+                <div class="role">Münster</div>
+                <div class="contact">Tel: 0251 7189 255<br/>verkauf-ms@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Marcus Weber</div>
+                <div class="role">Investitionsgüterberatung</div>
+                <div class="contact">Tel: 0160 2789318<br/>marcus.weber@ebaeko.de</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Silke Cordes</div>
+                <div class="role">Seminare</div>
+                <div class="contact">Tel: 0441 9711 148<br/>seminare@ebaeko.de</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section" id="stimmen">
+    <div class="section-inner">
+        <div class="section-label">// Kundenstimmen</div>
+        <div class="section-title">Was unsere Mitglieder sagen</div>
+
+        <div class="testimonial">
+            <blockquote>Die EBÄKO eG ist für mich der ideale Begleiter für die Weiterentwicklung unseres Betriebs. In der Generationsübergabe des Betriebes hat die EBÄKO mich jederzeit flexibel beraten und unbürokratisch unterstützt und somit zu einem reibungslosen Übergang beigetragen.</blockquote>
+            <cite>Lars Kempe, Bäckerei Kempe, Wilhelmshaven</cite>
+        </div>
+
+        <div style="text-align:right;margin-top:1rem">
+            <a href="https://www.ebaeko.de/kundenstimmen/" target="_blank" style="font-size:0.75rem;letter-spacing:0.1em;">Alle Kundenstimmen →</a>
+        </div>
+    </div>
+</section>
+
+<!-- Karriere -->
+<section class="section" id="karriere">
+    <div class="section-inner">
+        <div class="section-label">// Karriere</div>
+        <div class="section-title">Neue Wege gehen</div>
+        <div class="section-desc">Egal ob in der Logistik, im Vertrieb oder in anderen Unternehmensbereichen – wir sind immer auf der Suche nach Menschen, die gemeinsam mit uns die erfolgreiche Zukunft der EBÄKO gestalten wollen.</div>
+
+        <div class="grid-3">
+            <div class="card">
+                <div class="icon">🔒</div>
+                <h3>Sicherheit</h3>
+                <p>Wir sind ein krisensicherer Arbeitgeber und bieten einen Arbeitsplatz mit modernster Technik und Sicherheit an oberster Stelle.</p>
+            </div>
+            <div class="card">
+                <div class="icon">📈</div>
+                <h3>Entwicklung</h3>
+                <p>Wir fördern und unterstützen unsere Mitarbeiter mit passenden Weiterbildungs- und Entwicklungsmöglichkeiten.</p>
+            </div>
+            <div class="card">
+                <div class="icon">🚀</div>
+                <h3>Eigenverantwortung</h3>
+                <p>interessante Tätigkeiten und den Raum für eigenverantwortliches Arbeiten in einem zukunftssicheren Umfeld.</p>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:1.5rem">
+            <a href="https://www.ebaeko.de/karriere/" target="_blank" style="display:inline-block;padding:0.7rem 2rem;border:1px solid rgba(0,159,227,0.25);border-radius:50px;color:var(--cyan);font-size:0.75rem;letter-spacing:0.15em;transition:all 0.4s;background:rgba(0,159,227,0.05);">Job- &amp; Ausbildungsstellen →</a>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div>
+            <h4>EBÄKO eG</h4>
+            <p>Genossenschaft der Bäckereien<br/>Weser-Ems-Mitte</p>
+            <p style="margin-top:0.5rem">Tel: +49 441 9711-0<br/>Mo – Do: 7:00 – 16:30 Uhr<br/>Fr: 7:00 – 14:00 Uhr</p>
+            <div class="social">
+                <a href="https://www.xing.com/pages/ebaeko-eg" target="_blank">
+                    <img src="https://www.ebaeko.de/wp-content/uploads/2023/10/XING.svg" alt="Xing" onerror="this.style.display='none'" />
+                </a>
+                <a href="https://de.linkedin.com/company/ebko-eg" target="_blank">
+                    <img src="https://www.ebaeko.de/wp-content/uploads/2023/10/LinkedIn.svg" alt="LinkedIn" onerror="this.style.display='none'" />
+                </a>
+                <a href="https://www.instagram.com/ebaeko/" target="_blank">
+                    <img src="https://www.ebaeko.de/wp-content/uploads/2023/10/Instagram-1.svg" alt="Instagram" onerror="this.style.display='none'" />
+                </a>
+            </div>
+        </div>
+        <div>
+            <h4>Über uns</h4>
+            <a href="https://www.ebaeko.de/ueber-uns/">Unternehmen</a><br/>
+            <a href="https://www.ebaeko.de/ueber-uns/#standorte">Standorte</a><br/>
+            <a href="https://www.ebaeko.de/nachhaltigkeit/">Nachhaltigkeit</a><br/>
+            <a href="https://www.ebaeko.de/geschaeftsberichte/">Geschäftsberichte</a><br/>
+            <a href="https://www.ebaeko.de/karriere/">Karriere</a>
+        </div>
+        <div>
+            <h4>Leistungen</h4>
+            <a href="https://www.ebaeko.de/produkte/">Produkte</a><br/>
+            <a href="https://www.ebaeko.de/technik/">Technik</a><br/>
+            <a href="https://www.ebaeko.de/service/">Service</a><br/>
+            <a href="https://www.ebaeko.de/seminare-workshops/">Seminare</a><br/>
+            <a href="https://www.ebaeko.de/gebrauchtmaschinen/">Gebrauchtmaschinen</a>
+        </div>
+        <div>
+            <h4>Rechtliches</h4>
+            <a href="https://www.ebaeko.de/kontakt/">Kontakt</a><br/>
+            <a href="https://www.ebaeko.de/impressum/">Impressum</a><br/>
+            <a href="https://www.ebaeko.de/datenschutz/">Datenschutz</a><br/>
+            <a href="https://www.ebaeko.de/agb/">AGB</a><br/>
+            <a href="https://www.ebaeko.de">ebaeko.de →</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        EBÄKO eG // Cyber Concept Demo — <a href="https://github.com/yazeedmustafa57-bit/yazed">GitHub</a> — <a href="https://www.ebaeko.de">Original-Seite</a>
+    </div>
+</footer>
+
+</div><!-- /content-wrap -->
 
 <script type="importmap">
 {
@@ -378,327 +947,124 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 // ===== SCENE =====
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x001020);
-
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 200);
 camera.position.set(0, 0.5, 6);
-
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.toneMapping = THREE.ReinhardToneMapping;
 renderer.toneMappingExposure = 1.2;
 document.body.prepend(renderer.domElement);
-
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(
-    new THREE.Vector2(window.innerWidth, window.innerHeight),
-    0.5, 0.15, 0.05
-);
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.45, 0.15, 0.05);
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 
-// ===== LIGHTS =====
+// Lights
 scene.add(new THREE.AmbientLight(0x001040, 0.8));
-const dl1 = new THREE.DirectionalLight(0x009FE3, 2.5);
-dl1.position.set(4, 5, 6);
-scene.add(dl1);
-const dl2 = new THREE.DirectionalLight(0x00ffff, 1.5);
-dl2.position.set(-4, 2, 5);
-scene.add(dl2);
-const dl3 = new THREE.DirectionalLight(0x004070, 1);
-dl3.position.set(0, -3, -5);
-scene.add(dl3);
+const dl1 = new THREE.DirectionalLight(0x009FE3, 2.5); dl1.position.set(4,5,6); scene.add(dl1);
+const dl2 = new THREE.DirectionalLight(0x00ffff, 1.5); dl2.position.set(-4,2,5); scene.add(dl2);
+const dl3 = new THREE.DirectionalLight(0x004070, 1); dl3.position.set(0,-3,-5); scene.add(dl3);
 
-// ===== MAIN GROUP =====
-const group = new THREE.Group();
-scene.add(group);
+const group = new THREE.Group(); scene.add(group);
 
-// ===== CORE — abstract flame/grain symbol =====
-// Central glowing sphere
-const coreGeo = new THREE.IcosahedronGeometry(0.25, 1);
-const coreMat = new THREE.MeshBasicMaterial({
-    color: 0x009FE3,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.8,
-});
-const core = new THREE.Mesh(coreGeo, coreMat);
+// Core
+const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2,1), new THREE.MeshBasicMaterial({color:0x009FE3,wireframe:true,transparent:true,opacity:0.9}));
 group.add(core);
+const glow = new THREE.Mesh(new THREE.SphereGeometry(0.28,16,16), new THREE.MeshBasicMaterial({color:0x009FE3,transparent:true,opacity:0.2}));
+group.add(glow);
 
-// Inner glow
-const glowGeo = new THREE.SphereGeometry(0.3, 16, 16);
-const glowMat = new THREE.MeshBasicMaterial({
-    color: 0x009FE3,
-    transparent: true,
-    opacity: 0.2,
-});
-const glowMesh = new THREE.Mesh(glowGeo, glowMat);
-group.add(glowMesh);
-
-// Outer shell (dodecahedron for variation)
-const shellGeo = new THREE.DodecahedronGeometry(0.6, 0);
-const shellMat = new THREE.MeshBasicMaterial({
-    color: 0x009FE3,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.15,
-});
-const shell = new THREE.Mesh(shellGeo, shellMat);
+// Shell
+const shell = new THREE.Mesh(new THREE.DodecahedronGeometry(0.55,0), new THREE.MeshBasicMaterial({color:0x009FE3,wireframe:true,transparent:true,opacity:0.12}));
 group.add(shell);
 
-// ===== GRAIN RING =====
-// A ring that looks like a wreath of grain/backform
-const grainRing = new THREE.Group();
-group.add(grainRing);
-
-const ringMain = new THREE.Mesh(
-    new THREE.TorusGeometry(1.0, 0.025, 16, 64),
-    new THREE.MeshBasicMaterial({ color: 0x009FE3, transparent: true, opacity: 0.4 })
-);
-ringMain.rotation.x = Math.PI / 2;
-grainRing.add(ringMain);
-
-// Small "grain" nodes around the ring
-const grainCount = 24;
-const grainMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.6 });
-for (let i = 0; i < grainCount; i++) {
-    const a = (i / grainCount) * Math.PI * 2;
-    const g = new THREE.Mesh(
-        new THREE.SphereGeometry(0.04, 6, 6),
-        grainMat.clone()
-    );
-    g.position.set(Math.cos(a) * 1.0, 0, Math.sin(a) * 1.0);
-    g.material.color.setHSL(0.55 + Math.random() * 0.1, 1, 0.6);
-    grainRing.add(g);
+// Grain ring with nodes
+const grainRing = new THREE.Group(); group.add(grainRing);
+const ringMain = new THREE.Mesh(new THREE.TorusGeometry(0.9,0.02,16,64), new THREE.MeshBasicMaterial({color:0x009FE3,transparent:true,opacity:0.3}));
+ringMain.rotation.x = Math.PI/2; grainRing.add(ringMain);
+for(let i=0;i<20;i++){
+    const a=(i/20)*Math.PI*2;
+    const g=new THREE.Mesh(new THREE.SphereGeometry(0.035,6,6), new THREE.MeshBasicMaterial({color:0x00ffff,transparent:true,opacity:0.5}));
+    g.position.set(Math.cos(a)*0.9,0,Math.sin(a)*0.9); grainRing.add(g);
 }
 
-// ===== FLOATING PARTICLES (bakery/dust motes) =====
-const dustCount = 800;
-const dustPos = new Float32Array(dustCount * 3);
-const dustData = [];
-for (let i = 0; i < dustCount; i++) {
-    const r = 0.5 + Math.random() * 3.5;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(2 * Math.random() - 1);
-    dustData.push({
-        r, theta, phi,
-        speed: 0.1 + Math.random() * 0.5,
-        off: Math.random() * Math.PI * 2,
-        ox: (Math.random() - 0.5) * 0.5,
-        oy: (Math.random() - 0.5) * 0.5,
-        oz: (Math.random() - 0.5) * 0.5,
-    });
-    dustPos[i*3] = Math.sin(phi)*Math.cos(theta)*r;
-    dustPos[i*3+1] = Math.sin(phi)*Math.sin(theta)*r;
-    dustPos[i*3+2] = Math.cos(phi)*r;
+// Cyber rings
+for(let i=0;i<5;i++){
+    const r=new THREE.Mesh(new THREE.TorusGeometry(1.2+i*0.22,0.005,8,48), new THREE.MeshBasicMaterial({color:i%2===0?0x009FE3:0x00ffff,transparent:true,opacity:0.1,side:THREE.DoubleSide}));
+    r.rotation.x=Math.PI/3+i*0.2; r.rotation.z=i*0.3; group.add(r);
 }
-const dustGeo = new THREE.BufferGeometry();
-dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
-const dustMat = new THREE.PointsMaterial({
-    color: 0x009FE3,
-    size: 0.025,
-    transparent: true,
-    opacity: 0.3,
-    blending: THREE.AdditiveBlending,
-    sizeAttenuation: true,
-});
-const dustPts = new THREE.Points(dustGeo, dustMat);
+
+// Dust particles (like flour/sparkles)
+const dustCount=600; const dustPos=new Float32Array(dustCount*3); const dustData=[];
+for(let i=0;i<dustCount;i++){
+    const r=0.5+Math.random()*3.2, theta=Math.random()*Math.PI*2, phi=Math.acos(2*Math.random()-1);
+    dustData.push({r,theta,phi,speed:0.1+Math.random()*0.5,off:Math.random()*Math.PI*2});
+    dustPos[i*3]=Math.sin(phi)*Math.cos(theta)*r;
+    dustPos[i*3+1]=Math.sin(phi)*Math.sin(theta)*r;
+    dustPos[i*3+2]=Math.cos(phi)*r;
+}
+const dustGeo=new THREE.BufferGeometry(); dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPos,3));
+const dustPts=new THREE.Points(dustGeo, new THREE.PointsMaterial({color:0x009FE3,size:0.02,transparent:true,opacity:0.2,blending:THREE.AdditiveBlending,sizeAttenuation:true}));
 group.add(dustPts);
 
-// ===== CYBER RINGS =====
-for (let i = 0; i < 5; i++) {
-    const r = new THREE.Mesh(
-        new THREE.TorusGeometry(1.4 + i * 0.25, 0.006, 8, 48),
-        new THREE.MeshBasicMaterial({
-            color: i % 2 === 0 ? 0x009FE3 : 0x00ffff,
-            transparent: true,
-            opacity: 0.12,
-            side: THREE.DoubleSide,
-        })
-    );
-    r.rotation.x = Math.PI / 3 + i * 0.2;
-    r.rotation.z = i * 0.3;
-    group.add(r);
+// Stars
+const starCount=2500; const sPos=new Float32Array(starCount*3); const sCol=new Float32Array(starCount*3); const sVel=[];
+for(let i=0;i<starCount;i++){
+    const r=12+Math.random()*45, theta=Math.random()*Math.PI*2, phi=Math.acos(2*Math.random()-1);
+    sPos[i*3]=Math.sin(phi)*Math.cos(theta)*r; sPos[i*3+1]=Math.sin(phi)*Math.sin(theta)*r; sPos[i*3+2]=Math.cos(phi)*r;
+    const c=new THREE.Color().setHSL(0.55+Math.random()*0.15,0.6,0.3+Math.random()*0.4);
+    sCol[i*3]=c.r; sCol[i*3+1]=c.g; sCol[i*3+2]=c.b;
+    sVel.push({x:(Math.random()-0.5)*0.002,y:(Math.random()-0.5)*0.002,z:(Math.random()-0.5)*0.002});
 }
-
-// ===== BACKGROUND STARS =====
-const starCount = 3000;
-const sPos = new Float32Array(starCount * 3);
-const sCol = new Float32Array(starCount * 3);
-const sSiz = new Float32Array(starCount);
-const sVel = [];
-for (let i = 0; i < starCount; i++) {
-    const r = 12 + Math.random() * 50;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(2 * Math.random() - 1);
-    sPos[i*3] = Math.sin(phi)*Math.cos(theta)*r;
-    sPos[i*3+1] = Math.sin(phi)*Math.sin(theta)*r;
-    sPos[i*3+2] = Math.cos(phi)*r;
-    const c = new THREE.Color().setHSL(0.55 + Math.random()*0.15, 0.6, 0.3 + Math.random()*0.4);
-    sCol[i*3] = c.r; sCol[i*3+1] = c.g; sCol[i*3+2] = c.b;
-    sSiz[i] = 0.02 + Math.random() * 0.1;
-    sVel.push({
-        x: (Math.random()-0.5)*0.002,
-        y: (Math.random()-0.5)*0.002,
-        z: (Math.random()-0.5)*0.002,
-    });
-}
-const sg = new THREE.BufferGeometry();
-sg.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
-sg.setAttribute('color', new THREE.BufferAttribute(sCol, 3));
-sg.setAttribute('size', new THREE.BufferAttribute(sSiz, 1));
-const sm = new THREE.PointsMaterial({
-    size: 0.06,
-    vertexColors: true,
-    transparent: true,
-    opacity: 0.5,
-    blending: THREE.AdditiveBlending,
-    sizeAttenuation: true,
-});
-const stars = new THREE.Points(sg, sm);
+const sg=new THREE.BufferGeometry(); sg.setAttribute('position',new THREE.BufferAttribute(sPos,3)); sg.setAttribute('color',new THREE.BufferAttribute(sCol,3));
+const stars=new THREE.Points(sg, new THREE.PointsMaterial({size:0.05,vertexColors:true,transparent:true,opacity:0.4,blending:THREE.AdditiveBlending,sizeAttenuation:true}));
 scene.add(stars);
 
-// ===== LIGHTNING STREAKS (data lines) =====
-const streakGroup = new THREE.Group();
-scene.add(streakGroup);
-for (let i = 0; i < 20; i++) {
-    const pts = [];
-    const len = 3 + Math.random() * 5;
-    for (let j = 0; j < len; j++) {
-        pts.push(new THREE.Vector3(
-            (Math.random()-0.5)*3, (Math.random()-0.5)*3, (Math.random()-0.5)*3
-        ));
-    }
-    const curve = new THREE.CatmullRomCurve3(pts);
-    const g = new THREE.BufferGeometry().setFromPoints(curve.getPoints(16));
-    const m = new THREE.LineBasicMaterial({
-        color: new THREE.Color().setHSL(0.55 + Math.random()*0.1, 1, 0.4),
-        transparent: true,
-        opacity: 0.05 + Math.random() * 0.1,
-    });
-    const line = new THREE.Line(g, m);
-    const r = 3 + Math.random() * 5;
-    const t2 = Math.random() * Math.PI * 2;
-    const p2 = Math.acos(2*Math.random() - 1);
-    line.position.set(
-        Math.sin(p2)*Math.cos(t2)*r,
-        Math.sin(p2)*Math.sin(t2)*r,
-        Math.cos(p2)*r
-    );
-    line.scale.setScalar(0.5 + Math.random());
-    streakGroup.add(line);
+// Streaks
+const streakGroup=new THREE.Group(); scene.add(streakGroup);
+for(let i=0;i<15;i++){
+    const pts=[]; for(let j=0;j<3+Math.random()*4;j++) pts.push(new THREE.Vector3((Math.random()-0.5)*3,(Math.random()-0.5)*3,(Math.random()-0.5)*3));
+    const g=new THREE.BufferGeometry().setFromPoints(new THREE.CatmullRomCurve3(pts).getPoints(12));
+    const m=new THREE.LineBasicMaterial({color:new THREE.Color().setHSL(0.55+Math.random()*0.1,1,0.4),transparent:true,opacity:0.04+Math.random()*0.08});
+    const line=new THREE.Line(g,m); const r=3+Math.random()*4; const t2=Math.random()*Math.PI*2; const p2=Math.acos(2*Math.random()-1);
+    line.position.set(Math.sin(p2)*Math.cos(t2)*r,Math.sin(p2)*Math.sin(t2)*r,Math.cos(p2)*r);
+    line.scale.setScalar(0.5+Math.random()); streakGroup.add(line);
 }
 
-// ===== MOUSE / TOUCH =====
-let mx = 0, my = 0;
-let tx = 0, ty = 0;
-document.addEventListener('mousemove', (e) => {
-    mx = (e.clientX / window.innerWidth) * 2 - 1;
-    my = -(e.clientY / window.innerHeight) * 2 + 1;
-});
-let touchStartX = 0, touchStartY = 0, touchActive = false;
-document.addEventListener('touchstart', (e) => {
-    touchActive = true;
-    if (e.touches.length === 1) {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-    }
-}, { passive: true });
-document.addEventListener('touchmove', (e) => {
-    if (!touchActive || e.touches.length !== 1) return;
-    const dx = Math.abs(e.touches[0].clientX - touchStartX);
-    const dy = Math.abs(e.touches[0].clientY - touchStartY);
-    if (dx > dy && dx > 10) {
-        mx = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
-        my = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
-    }
-}, { passive: true });
-document.addEventListener('touchend', () => {
-    touchActive = false; mx = 0; my = 0;
-}, { passive: true });
+// Mouse
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth)*2-1;my=-(e.clientY/innerHeight)*2+1;});
+let tsx=0,tsy=0,ta=false;
+document.addEventListener('touchstart',e=>{ta=true;if(e.touches.length===1){tsx=e.touches[0].clientX;tsy=e.touches[0].clientY;}},{passive:true});
+document.addEventListener('touchmove',e=>{if(!ta||e.touches.length!==1)return;const dx=Math.abs(e.touches[0].clientX-tsx),dy=Math.abs(e.touches[0].clientY-tsy);if(dx>dy&&dx>10){mx=(e.touches[0].clientX/innerWidth)*2-1;my=-(e.touches[0].clientY/innerHeight)*2+1;}},{passive:true});
+document.addEventListener('touchend',()=>{ta=false;mx=0;my=0;},{passive:true});
 
-// ===== RESIZE =====
-window.addEventListener('resize', () => {
-    const w = window.innerWidth, h = window.innerHeight;
-    camera.aspect = w / h; camera.updateProjectionMatrix();
-    renderer.setSize(w, h); composer.setSize(w, h);
-});
+window.addEventListener('resize',()=>{const w=innerWidth,h=innerHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);composer.setSize(w,h);});
 
-// ===== ANIMATION =====
-const clock = new THREE.Clock();
-function animate() {
+const clock=new THREE.Clock();
+function animate(){
     requestAnimationFrame(animate);
-    const t = clock.getElapsedTime();
+    const t=clock.getElapsedTime();
+    tx+=(mx-tx)*0.04; ty+=(my-ty)*0.04;
 
-    tx += (mx - tx) * 0.04;
-    ty += (my - ty) * 0.04;
+    const p=1+Math.sin(t*0.8)*0.03; core.scale.set(p,p,p); glow.scale.set(p*1.6,p*1.6,p*1.6); glow.material.opacity=0.15+Math.sin(t*0.8)*0.08;
+    shell.rotation.x=t*0.025+ty*0.3; shell.rotation.y=t*0.035+tx*0.4;
+    grainRing.rotation.x=Math.PI/2+Math.sin(t*0.08)*0.04; grainRing.rotation.z=t*0.06;
+    group.children.filter(c=>c.geometry&&c.geometry.type==='TorusGeometry'&&c!==ringMain&&!grainRing.children.includes(c)).forEach((r,i)=>{r.rotation.x+=0.002*(i%2===0?1:-1);r.rotation.y+=0.003*(i%2===0?-1:1);});
 
-    // Core pulsing
-    const p = 1 + Math.sin(t * 1.0) * 0.04;
-    core.scale.set(p, p, p);
-    glowMesh.scale.set(p * 1.8, p * 1.8, p * 1.8);
-    glowMat.opacity = 0.15 + Math.sin(t * 1.0) * 0.08;
+    const dp=dustPts.geometry.attributes.position.array;
+    for(let i=0;i<dustCount;i++){const d=dustData[i];const th=d.theta+t*d.speed*0.025;const ph=d.phi+Math.sin(t*d.speed*0.015+d.off)*0.02;const rr=d.r+Math.sin(t*0.2+d.off)*0.08;dp[i*3]=Math.sin(ph)*Math.cos(th)*rr;dp[i*3+1]=Math.sin(ph)*Math.sin(th)*rr;dp[i*3+2]=Math.cos(ph)*rr;}
+    dustPts.geometry.attributes.position.needsUpdate=true;
 
-    // Shell rotation
-    shell.rotation.x = t * 0.03 + ty * 0.3;
-    shell.rotation.y = t * 0.04 + tx * 0.4;
+    const sp=stars.geometry.attributes.position.array;
+    for(let i=0;i<starCount;i++){sp[i*3]+=sVel[i].x;sp[i*3+1]+=sVel[i].y;sp[i*3+2]+=sVel[i].z;const r=Math.sqrt(sp[i*3]**2+sp[i*3+1]**2+sp[i*3+2]**2);if(r>60){const nr=12+Math.random()*10,t2=Math.random()*Math.PI*2,p2=Math.acos(2*Math.random()-1);sp[i*3]=Math.sin(p2)*Math.cos(t2)*nr;sp[i*3+1]=Math.sin(p2)*Math.sin(t2)*nr;sp[i*3+2]=Math.cos(p2)*nr;}}
+    stars.geometry.attributes.position.needsUpdate=true;
 
-    // Grain ring
-    grainRing.rotation.x = Math.PI / 2 + Math.sin(t * 0.1) * 0.05;
-    grainRing.rotation.z = t * 0.08;
+    streakGroup.rotation.y=t*0.012; streakGroup.rotation.x=Math.sin(t*0.006)*0.08;
 
-    // Cyber rings
-    const rings = group.children.filter(c => c.geometry && c.geometry.type === 'TorusGeometry' && c !== ringMain && !grainRing.children.includes(c));
-    rings.forEach((r, i) => {
-        r.rotation.x += 0.002 * (i % 2 === 0 ? 1 : -1);
-        r.rotation.y += 0.003 * (i % 2 === 0 ? -1 : 1);
-        r.rotation.z += 0.001 * i;
-    });
-
-    // Dust particles
-    const dp = dustPts.geometry.attributes.position.array;
-    for (let i = 0; i < dustCount; i++) {
-        const d = dustData[i];
-        const th = d.theta + t * d.speed * 0.03;
-        const ph = d.phi + Math.sin(t * d.speed * 0.02 + d.off) * 0.02;
-        const rr = d.r + Math.sin(t * 0.3 + d.off) * 0.1;
-        dp[i*3] = Math.sin(ph)*Math.cos(th)*rr + Math.sin(t*0.1 + d.off)*0.1;
-        dp[i*3+1] = Math.sin(ph)*Math.sin(th)*rr + Math.cos(t*0.08 + d.off)*0.1;
-        dp[i*3+2] = Math.cos(ph)*rr;
-    }
-    dustPts.geometry.attributes.position.needsUpdate = true;
-
-    // Stars drift
-    const sp = stars.geometry.attributes.position.array;
-    for (let i = 0; i < starCount; i++) {
-        sp[i*3] += sVel[i].x;
-        sp[i*3+1] += sVel[i].y;
-        sp[i*3+2] += sVel[i].z;
-        const r = Math.sqrt(sp[i*3]**2 + sp[i*3+1]**2 + sp[i*3+2]**2);
-        if (r > 60) {
-            const nr = 12 + Math.random()*10;
-            const t2 = Math.random()*Math.PI*2;
-            const p2 = Math.acos(2*Math.random()-1);
-            sp[i*3] = Math.sin(p2)*Math.cos(t2)*nr;
-            sp[i*3+1] = Math.sin(p2)*Math.sin(t2)*nr;
-            sp[i*3+2] = Math.cos(p2)*nr;
-        }
-    }
-    stars.geometry.attributes.position.needsUpdate = true;
-
-    // Streaks
-    streakGroup.rotation.y = t * 0.015;
-    streakGroup.rotation.x = Math.sin(t * 0.008) * 0.1;
-
-    // Camera drift
-    camera.position.x = Math.sin(t * 0.012) * 0.6 + tx * 0.7;
-    camera.position.y = 0.5 + Math.sin(t * 0.015) * 0.15 + ty * 0.4;
-    camera.lookAt(0, 0, 0);
-
-    // Bloom pulse
-    bloom.strength = 0.45 + Math.sin(t * 0.2) * 0.1;
-
+    camera.position.x=Math.sin(t*0.01)*0.5+tx*0.6; camera.position.y=0.5+Math.sin(t*0.012)*0.12+ty*0.35; camera.lookAt(0,0,0);
+    bloom.strength=0.4+Math.sin(t*0.15)*0.08;
     composer.render();
 }
 animate();
