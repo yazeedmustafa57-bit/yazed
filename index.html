@@ -1408,6 +1408,23 @@ for(let i=0;i<15;i++){
     line.scale.setScalar(0.5+Math.random()); streakGroup.add(line);
 }
 
+// ===== EBAKO TRUCK =====
+const tGroup = new THREE.Group();
+scene.add(tGroup);
+const tTex = new THREE.TextureLoader().load("truck.jpg");
+const tSprite = new THREE.Sprite(new THREE.SpriteMaterial({map:tTex,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+tSprite.scale.set(2,1.125,1);
+tGroup.add(tSprite);
+const tR1 = new THREE.Mesh(new THREE.TorusGeometry(0.8,0.02,8,32),new THREE.MeshBasicMaterial({color:0x009FE3,transparent:true,opacity:0.2}));
+tR1.rotation.x=Math.PI/2;tR1.position.z=-0.1;tGroup.add(tR1);
+const tR2 = new THREE.Mesh(new THREE.TorusGeometry(1.1,0.008,8,32),new THREE.MeshBasicMaterial({color:0x00ffff,transparent:true,opacity:0.15}));
+tR2.rotation.x=Math.PI/3;tR2.rotation.z=Math.PI/4;tR2.position.z=-0.15;tGroup.add(tR2);
+const tGlow = new THREE.Mesh(new THREE.PlaneGeometry(2.8,1.6),new THREE.MeshBasicMaterial({color:0x009FE3,transparent:true,opacity:0.06,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false}));
+tGlow.position.z=-0.2;tGroup.add(tGlow);
+const tTC=25;const tPos=new Float32Array(tTC*3);const tGeo=new THREE.BufferGeometry();tGeo.setAttribute("position",new THREE.BufferAttribute(tPos,3));
+const tTrail=new THREE.Points(tGeo,new THREE.PointsMaterial({color:0x00ffff,size:0.04,transparent:true,opacity:0.3,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true}));
+scene.add(tTrail);const tHist=[];const tMax=25;let tAng=0;
+
 // Mouse
 let mx=0,my=0,tx=0,ty=0;
 document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth)*2-1;my=-(e.clientY/innerHeight)*2+1;});
@@ -1440,6 +1457,17 @@ function animate(){
     streakGroup.rotation.y=t*0.012; streakGroup.rotation.x=Math.sin(t*0.006)*0.08;
 
     camera.position.x=Math.sin(t*0.01)*0.5+tx*0.6; camera.position.y=0.5+Math.sin(t*0.012)*0.12+ty*0.35; camera.lookAt(0,0,0);
+    // Truck animation
+    tAng+=0.008+tx*0.002;
+    const tR=2.8+Math.sin(t*0.3)*0.3;
+    const tX=Math.cos(tAng)*tR,tZ=Math.sin(tAng)*tR,tY=0.4+Math.sin(t*0.6+tAng)*0.25;
+    tGroup.position.set(tX,tY,tZ);
+    tR1.rotation.z+=0.01;tR2.rotation.x+=0.005;tR2.rotation.y+=0.008;
+    const tp=tTrail.geometry.attributes.position.array;
+    tHist.unshift({x:tX,y:tY,z:tZ});if(tHist.length>tMax)tHist.pop();
+    for(let i=0;i<tTC;i++){if(i<tHist.length){tp[i*3]=tHist[i].x;tp[i*3+1]=tHist[i].y;tp[i*3+2]=tHist[i].z;}else{tp[i*3]=tX;tp[i*3+1]=tY;tp[i*3+2]=tZ;}}
+    tTrail.geometry.attributes.position.needsUpdate=true;
+
     bloom.strength=0.4+Math.sin(t*0.15)*0.08;
     composer.render();
 }
