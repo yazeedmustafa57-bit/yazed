@@ -337,6 +337,18 @@
             aspect-ratio: 16/9;
             object-fit: cover;
         }
+        .news-item .meta {
+            display: inline-block;
+            font-size: 0.65rem;
+            color: rgba(0,159,227,0.5);
+            letter-spacing: 0.05em;
+            transition: color 0.3s, transform 0.3s;
+            cursor: pointer;
+        }
+        .news-item .meta:hover {
+            color: var(--cyan);
+            transform: translateX(4px);
+        }
         @media (max-width: 600px) {
             .news-item { grid-template-columns: 1fr; }
         }
