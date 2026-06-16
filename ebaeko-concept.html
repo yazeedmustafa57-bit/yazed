@@ -628,77 +628,6 @@
         }
         ::-webkit-scrollbar { width: 4px; }
 
-    
-        /* ===== SPA IFRAME OVERLAY ===== */
-        .spa-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 9999;
-            background: rgba(0,8,16,0.92);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            animation: spaFadeIn 0.3s ease-out;
-        }
-        .spa-overlay.active { display: flex; flex-direction: column; }
-        @keyframes spaFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .spa-overlay-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.8rem 1.5rem;
-            background: rgba(0,16,32,0.98);
-            border-bottom: 1px solid rgba(0,159,227,0.1);
-            flex-shrink: 0;
-        }
-        .spa-overlay-header .url {
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.3);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 60%;
-        }
-        .spa-overlay-header .url span { color: var(--cyan); }
-        .spa-close-btn {
-            background: none;
-            border: 1px solid rgba(0,159,227,0.2);
-            color: var(--cyan);
-            padding: 0.4rem 1.2rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            letter-spacing: 0.1em;
-            transition: all 0.3s;
-        }
-        .spa-close-btn:hover {
-            background: rgba(0,159,227,0.1);
-            border-color: var(--cyan);
-        }
-        .spa-overlay-body {
-            flex: 1;
-            position: relative;
-        }
-        .spa-overlay-body iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #fff;
-        }
-        .spa-overlay-body .loading {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--cyan);
-            font-size: 0.8rem;
-            letter-spacing: 0.2em;
-        }
-        @media (max-width: 768px) {
-            .spa-overlay-header { padding: 0.6rem 1rem; }
-            .spa-overlay-header .url { font-size: 0.6rem; max-width: 50%; }
             .spa-close-btn { padding: 0.3rem 0.8rem; font-size: 0.65rem; }
         }
 
@@ -725,7 +654,7 @@
         <li><a href="#team">Team</a></li>
         <li><a href="#stimmen">Stimmen</a></li>
         <li><a href="#karriere">Karriere</a></li>
-        <li><a href="https://www.ebaeko.de">Original →</a></li>
+        <li><a href="https://www.ebaeko.de" target="_blank" rel="noopener">Original →</a></li>
     </ul>
     <div class="nav-hamburger">☰</div>
 </nav>
@@ -769,7 +698,7 @@
                 <div class="date">2026</div>
                 <h3>Neu im Angebot: Prüfung von Mehlsiloanlagen</h3>
                 <p>Unser Technischer Kundendienst in Oldenburg erweitert sein Leistungsspektrum: Ab sofort bieten wir auch die Prüfung von Mehlsiloanlagen in Bäckereibetrieben an.</p>
-                <a class="meta" href="https://www.ebaeko.de/news/">Zum Artikel →</a>
+                <a class="meta" href="https://www.ebaeko.de/news/" target="_blank" rel="noopener">Zum Artikel →</a>
             </div>
         </div>
 
@@ -779,12 +708,12 @@
                 <div class="date">Februar 2026</div>
                 <h3>RegioBack 2026: Erfolgreiche Premiere</h3>
                 <p>Mit der RegioBack 2026 haben die EBÄKO und die BÄKO WEST erstmals eine gemeinsame Fachmesse auf die Beine gestellt – und das mit großem Erfolg. Mehr als 3.000 Besucher:innen nutzten die Gelegenheit, sich bei rund 230 Ausstellern auf insgesamt 9.000 Quadratmetern über Trends und Lösungen für das backende Handwerk zu informieren.</p>
-                <a class="meta" href="https://www.ebaeko.de/news/">Zum Artikel →</a>
+                <a class="meta" href="https://www.ebaeko.de/news/" target="_blank" rel="noopener">Zum Artikel →</a>
             </div>
         </div>
 
         <div style="text-align:right;margin-top:0.5rem">
-            <a href="https://www.ebaeko.de/news/" style="font-size:0.75rem;letter-spacing:0.1em;">Alle Artikel ansehen →</a>
+            <a href="https://www.ebaeko.de/news/" target="_blank" rel="noopener" style="font-size:0.75rem;letter-spacing:0.1em;">Alle Artikel ansehen →</a>
         </div>
     </div>
 </section>
@@ -1045,7 +974,7 @@
         </div>
 
         <div style="text-align:right;margin-top:1rem">
-            <a href="https://www.ebaeko.de/kundenstimmen/" style="font-size:0.75rem;letter-spacing:0.1em;">Alle Kundenstimmen →</a>
+            <a href="https://www.ebaeko.de/kundenstimmen/" target="_blank" rel="noopener" style="font-size:0.75rem;letter-spacing:0.1em;">Alle Kundenstimmen →</a>
         </div>
     </div>
 </section>
@@ -1075,7 +1004,7 @@
             </div>
         </div>
         <div style="text-align:center;margin-top:1.5rem">
-            <a href="https://www.ebaeko.de/karriere/" style="display:inline-block;padding:0.7rem 2rem;border:1px solid rgba(0,159,227,0.25);border-radius:50px;color:var(--cyan);font-size:0.75rem;letter-spacing:0.15em;transition:all 0.4s;background:rgba(0,159,227,0.05);">Job- &amp; Ausbildungsstellen →</a>
+            <a href="https://www.ebaeko.de/karriere/" target="_blank" rel="noopener" style="display:inline-block;padding:0.7rem 2rem;border:1px solid rgba(0,159,227,0.25);border-radius:50px;color:var(--cyan);font-size:0.75rem;letter-spacing:0.1em;transition:all 0.4s;background:rgba(0,159,227,0.05);">Job- &amp; Ausbildungsstellen →</a>
         </div>
     </div>
 </section>
@@ -1088,44 +1017,44 @@
             <p>Genossenschaft der Bäckereien<br/>Weser-Ems-Mitte</p>
             <p style="margin-top:0.5rem">Tel: +49 441 9711-0<br/>Mo – Do: 7:00 – 16:30 Uhr<br/>Fr: 7:00 – 14:00 Uhr</p>
             <div class="social">
-                <a href="https://www.xing.com/pages/ebaeko-eg">
+                <a href="https://www.xing.com/pages/ebaeko-eg" target="_blank" rel="noopener">
                     <img src="https://www.ebaeko.de/wp-content/uploads/2023/10/XING.svg" alt="Xing" onerror="this.style.display='none'" />
                 </a>
-                <a href="https://de.linkedin.com/company/ebko-eg">
+                <a href="https://de.linkedin.com/company/ebko-eg" target="_blank" rel="noopener">
                     <img src="https://www.ebaeko.de/wp-content/uploads/2023/10/LinkedIn.svg" alt="LinkedIn" onerror="this.style.display='none'" />
                 </a>
-                <a href="https://www.instagram.com/ebaeko/">
+                <a href="https://www.instagram.com/ebaeko/" target="_blank" rel="noopener">
                     <img src="https://www.ebaeko.de/wp-content/uploads/2023/10/Instagram-1.svg" alt="Instagram" onerror="this.style.display='none'" />
                 </a>
             </div>
         </div>
         <div>
             <h4>Über uns</h4>
-            <a href="https://www.ebaeko.de/ueber-uns/">Unternehmen</a><br/>
-            <a href="https://www.ebaeko.de/ueber-uns/#standorte">Standorte</a><br/>
-            <a href="https://www.ebaeko.de/nachhaltigkeit/">Nachhaltigkeit</a><br/>
-            <a href="https://www.ebaeko.de/geschaeftsberichte/">Geschäftsberichte</a><br/>
-            <a href="https://www.ebaeko.de/karriere/">Karriere</a>
+            <a href="https://www.ebaeko.de/ueber-uns/" target="_blank" rel="noopener">Unternehmen</a><br/>
+            <a href="https://www.ebaeko.de/ueber-uns/#standorte" target="_blank" rel="noopener">Standorte</a><br/>
+            <a href="https://www.ebaeko.de/nachhaltigkeit/" target="_blank" rel="noopener">Nachhaltigkeit</a><br/>
+            <a href="https://www.ebaeko.de/geschaeftsberichte/" target="_blank" rel="noopener">Geschäftsberichte</a><br/>
+            <a href="https://www.ebaeko.de/karriere/" target="_blank" rel="noopener">Karriere</a>
         </div>
         <div>
             <h4>Leistungen</h4>
-            <a href="https://www.ebaeko.de/produkte/">Produkte</a><br/>
-            <a href="https://www.ebaeko.de/technik/">Technik</a><br/>
-            <a href="https://www.ebaeko.de/service/">Service</a><br/>
-            <a href="https://www.ebaeko.de/seminare-workshops/">Seminare</a><br/>
-            <a href="https://www.ebaeko.de/gebrauchtmaschinen/">Gebrauchtmaschinen</a>
+            <a href="https://www.ebaeko.de/produkte/" target="_blank" rel="noopener">Produkte</a><br/>
+            <a href="https://www.ebaeko.de/technik/" target="_blank" rel="noopener">Technik</a><br/>
+            <a href="https://www.ebaeko.de/service/" target="_blank" rel="noopener">Service</a><br/>
+            <a href="https://www.ebaeko.de/seminare-workshops/" target="_blank" rel="noopener">Seminare</a><br/>
+            <a href="https://www.ebaeko.de/gebrauchtmaschinen/" target="_blank" rel="noopener">Gebrauchtmaschinen</a>
         </div>
         <div>
             <h4>Rechtliches</h4>
-            <a href="https://www.ebaeko.de/kontakt/">Kontakt</a><br/>
-            <a href="https://www.ebaeko.de/impressum/">Impressum</a><br/>
-            <a href="https://www.ebaeko.de/datenschutz/">Datenschutz</a><br/>
-            <a href="https://www.ebaeko.de/agb/">AGB</a><br/>
-            <a href="https://www.ebaeko.de">ebaeko.de →</a>
+            <a href="https://www.ebaeko.de/kontakt/" target="_blank" rel="noopener">Kontakt</a><br/>
+            <a href="https://www.ebaeko.de/impressum/" target="_blank" rel="noopener">Impressum</a><br/>
+            <a href="https://www.ebaeko.de/datenschutz/" target="_blank" rel="noopener">Datenschutz</a><br/>
+            <a href="https://www.ebaeko.de/agb/" target="_blank" rel="noopener">AGB</a><br/>
+            <a href="https://www.ebaeko.de" target="_blank" rel="noopener">ebaeko.de →</a>
         </div>
     </div>
     <div class="footer-bottom">
-        EBÄKO eG // Cyber Concept Demo — <a href="https://github.com/yazeedmustafa57-bit/yazed">GitHub</a> — <a href="https://www.ebaeko.de">Original-Seite</a>
+        EBÄKO eG // Cyber Concept Demo — <a href="https://github.com/yazeedmustafa57-bit/yazed" target="_blank" rel="noopener">GitHub</a> — <a href="https://www.ebaeko.de" target="_blank" rel="noopener">Original-Seite</a>
     </div>
 </footer>
 
@@ -1299,84 +1228,9 @@ function animate(){
 animate();
 </script>
 
-<!-- SPA Iframe Overlay -->
-<div class="spa-overlay" id="spaOverlay">
-    <div class="spa-overlay-header">
-        <div class="url"><span>EBÄKO</span> <span id="spaUrlDisplay"></span></div>
-        <button class="spa-close-btn" id="spaCloseBtn">✕ Schließen</button>
-    </div>
-    <div class="spa-overlay-body">
-        <div class="loading" id="spaLoading">LADE INHALT ...</div>
-        <iframe id="spaIframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
-    </div>
-</div>
 
 
-<script>
-// SPA: alle externen Links im Overlay laden statt Seite zu verlassen
-document.addEventListener('DOMContentLoaded', function() {
-    const overlay = document.getElementById('spaOverlay');
-    const iframe = document.getElementById('spaIframe');
-    const urlDisplay = document.getElementById('spaUrlDisplay');
-    const loading = document.getElementById('spaLoading');
-    const closeBtn = document.getElementById('spaCloseBtn');
 
-    // Externe Links erkennen (alle https:// Links, die nicht zur aktuellen Domain gehören)
-    document.querySelectorAll('a[href^="https://"]').forEach(function(link) {
-        // Nur Links zu externen Domains abfangen
-        try {
-            const url = new URL(link.href);
-            if (url.hostname !== window.location.hostname) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    openInOverlay(link.href);
-                });
-            }
-        } catch(e) {}
-    });
-
-    // Auch absolute Pfade zu ebaeko.de (ohne Protokoll) abfangen
-    document.querySelectorAll('a[href^="//www.ebaeko.de"]').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            openInOverlay('https:' + link.href);
-        });
-    });
-
-    function openInOverlay(url) {
-        urlDisplay.textContent = url;
-        loading.style.display = 'block';
-        iframe.style.opacity = '0';
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        iframe.src = url;
-        iframe.addEventListener('load', function onLoad() {
-            loading.style.display = 'none';
-            iframe.style.opacity = '1';
-            iframe.removeEventListener('load', onLoad);
-        });
-    }
-
-    function closeOverlay() {
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-        setTimeout(function() {
-            iframe.src = 'about:blank';
-        }, 300);
-    }
-
-    closeBtn.addEventListener('click', closeOverlay);
-
-    // Escape-Taste zum Schließen
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && overlay.classList.contains('active')) {
-            closeOverlay();
-        }
-    });
-
-    // Klick außerhalb schließt nicht (nur Button)
-});
-</script>
 
 </body>
 </html>
