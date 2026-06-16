@@ -1217,12 +1217,15 @@
             <div style="padding:2rem;border-radius:16px;border:1px solid rgba(0,159,227,0.06);background:rgba(0,159,227,0.015)">
                 <div style="font-size:0.55rem;letter-spacing:0.6em;text-transform:uppercase;color:rgba(0,159,227,0.3);margin-bottom:1rem">// Kontaktformular</div>
                 <p style="font-size:0.8rem;color:rgba(255,255,255,0.3);margin-bottom:1.5rem">Für direkte Anfragen nutzen Sie bitte unsere Telefonnummer oder E-Mail-Adresse. Wir antworten in der Regel innerhalb von 24 Stunden.</p>
-                <div style="display:grid;gap:0.8rem">
-                    <input type="text" placeholder="Ihr Name" disabled style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1px solid rgba(0,159,227,0.1);background:rgba(0,159,227,0.03);color:rgba(255,255,255,0.3);font-size:0.8rem;outline:none" value="[Demo – bitte E-Mail nutzen]" />
-                    <input type="email" placeholder="Ihre E-Mail" disabled style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1px solid rgba(0,159,227,0.1);background:rgba(0,159,227,0.03);color:rgba(255,255,255,0.3);font-size:0.8rem;outline:none" />
-                    <textarea placeholder="Ihre Nachricht" disabled rows="3" style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1px solid rgba(0,159,227,0.1);background:rgba(0,159,227,0.03);color:rgba(255,255,255,0.3);font-size:0.8rem;outline:none;resize:none"></textarea>
-                    <div style="text-align:right;font-size:0.7rem;color:rgba(0,159,227,0.2)">⚡ Kontaktformular (Demo)</div>
-                </div>
+                <form id="kontakt-form" style="display:grid;gap:0.8rem" onsubmit="return handleKontakt(event)">
+                    <input type="text" name="name" placeholder="Ihr Name" required style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1px solid rgba(0,159,227,0.2);background:rgba(0,159,227,0.03);color:#fff;font-size:0.8rem;outline:none;transition:border-color 0.3s" />
+                    <input type="email" name="email" placeholder="Ihre E-Mail" required style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1px solid rgba(0,159,227,0.2);background:rgba(0,159,227,0.03);color:#fff;font-size:0.8rem;outline:none;transition:border-color 0.3s" />
+                    <textarea name="message" placeholder="Ihre Nachricht" required rows="3" style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1px solid rgba(0,159,227,0.2);background:rgba(0,159,227,0.03);color:#fff;font-size:0.8rem;outline:none;resize:vertical;transition:border-color 0.3s"></textarea>
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <button type="submit" style="padding:0.7rem 2rem;border:1px solid rgba(0,159,227,0.3);border-radius:8px;background:rgba(0,159,227,0.1);color:var(--cyan);font-size:0.8rem;cursor:pointer;letter-spacing:0.1em;transition:all 0.3s">📨 Nachricht senden</button>
+                        <div style="font-size:0.65rem;color:rgba(0,159,227,0.25)">info@ebaeko.de</div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -1446,6 +1449,9 @@ function animate(){
     composer.render();
 }
 animate();
+</script>
+<script>
+function handleKontakt(e){e.preventDefault();const f=e.target;const n=f.querySelector("[name=name]").value;const em=f.querySelector("[name=email]").value;const m=f.querySelector("[name=message]").value;const subj="Kontaktanfrage von "+encodeURIComponent(n);const body=encodeURIComponent("Name: "+n+"\nE-Mail: "+em+"\n\n"+m);window.location.href="mailto:info@ebaeko.de?subject="+subj+"&body="+body;return false;}
 </script>
 
 
