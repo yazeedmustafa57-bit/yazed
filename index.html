@@ -93,7 +93,7 @@
         @media (max-width: 700px) {
             .nav-links { display: none; }
         }
-        .nav-hamburger {
+        .nav-hamburger { touch-action: manipulation;
             display: none;
             color: rgba(255,255,255,0.5);
             font-size: 1.3rem;
@@ -410,6 +410,26 @@
         }
         .team-card .contact a { color: rgba(0,159,227,0.5); }
         .team-card .contact a:hover { color: var(--neon); }
+
+        .team-card .photo {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 0.8rem;
+            border: 2px solid rgba(0,159,227,0.2);
+            flex-shrink: 0;
+        }
+        .team-card .photo img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .team-card .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .team-card .card-body { flex: 1; }
         .team-group-label {
             font-size: 0.7rem;
             letter-spacing: 0.3em;
@@ -607,6 +627,8 @@
             padding: 1rem 2rem;
             gap: 1rem;
             border-bottom: 1px solid rgba(0,159,227,0.1);
+            pointer-events: auto;
+            z-index: 30;
         }
         @media (min-width: 701px) {
             .nav-links.active { display: flex; flex-direction: row; position: static; background: none; padding: 0; gap: 1.5rem; border: none; }
@@ -860,24 +882,44 @@
                 <div class="contact">Tel: 0160 880 3797<br/>matthias.bantel@ebaeko.de</div>
             </div>
             <div class="team-card">
-                <div class="name">Holger Klarmann</div>
-                <div class="role">Rechnungswesen – Fakturierung</div>
-                <div class="contact">Tel: 0441 9711 164<br/>holger.klarmann@ebaeko.de</div>
+                <div class="card-header">
+                    <div class="photo"><img src="https://www.ebaeko.de/wp-content/uploads/2025/08/DSC6055-scaled.jpg" alt="Holger Klarmann" loading="lazy"></div>
+                    <div class="card-body">
+                        <div class="name">Holger Klarmann</div>
+                        <div class="role">Rechnungswesen – Fakturierung</div>
+                        <div class="contact">Tel: 0441 9711 164<br/>holger.klarmann@ebaeko.de</div>
+                    </div>
+                </div>
             </div>
             <div class="team-card">
-                <div class="name">Lea Hoppe</div>
-                <div class="role">Rechnungswesen – Debitorenbuchhaltung</div>
-                <div class="contact">Tel: 0441 9711 141<br/>lea.hoppe@ebaeko.de</div>
+                <div class="card-header">
+                    <div class="photo"><img src="https://www.ebaeko.de/wp-content/uploads/2025/08/DSC6171-scaled.jpg" alt="Lea Hoppe" loading="lazy"></div>
+                    <div class="card-body">
+                        <div class="name">Lea Hoppe</div>
+                        <div class="role">Rechnungswesen – Debitorenbuchhaltung</div>
+                        <div class="contact">Tel: 0441 9711 141<br/>lea.hoppe@ebaeko.de</div>
+                    </div>
+                </div>
             </div>
             <div class="team-card">
-                <div class="name">Katrin Neumann</div>
-                <div class="role">Rechnungswesen – Finanzierungen</div>
-                <div class="contact">Tel: 0441 9711 169<br/>katrin.neumann@ebaeko.de</div>
+                <div class="card-header">
+                    <div class="photo"><img src="https://www.ebaeko.de/wp-content/uploads/2025/08/DSC6139-scaled.jpg" alt="Katrin Neumann" loading="lazy"></div>
+                    <div class="card-body">
+                        <div class="name">Katrin Neumann</div>
+                        <div class="role">Rechnungswesen – Finanzierungen</div>
+                        <div class="contact">Tel: 0441 9711 169<br/>katrin.neumann@ebaeko.de</div>
+                    </div>
+                </div>
             </div>
             <div class="team-card">
-                <div class="name">Sabine Geuting</div>
-                <div class="role">BackBüro + Bestell-App</div>
-                <div class="contact">Tel: 0251 7189 144<br/>sabine.geuting@ebaeko.de</div>
+                <div class="card-header">
+                    <div class="photo"><img src="https://www.ebaeko.de/wp-content/uploads/2023/11/service_backbuero.jpeg" alt="Sabine Geuting" loading="lazy"></div>
+                    <div class="card-body">
+                        <div class="name">Sabine Geuting</div>
+                        <div class="role">BackBüro + Bestell-App</div>
+                        <div class="contact">Tel: 0251 7189 144<br/>sabine.geuting@ebaeko.de</div>
+                    </div>
+                </div>
             </div>
             <div class="team-card">
                 <div class="name">Technischer Kundendienst</div>
@@ -895,9 +937,14 @@
                 <div class="contact">Tel: 0441 9711 235<br/>werkstatt@ebaeko.de</div>
             </div>
             <div class="team-card">
-                <div class="name">Oliver Gebel</div>
-                <div class="role">Qualitätsmanagement</div>
-                <div class="contact">Tel: 0441 9711 278<br/>oliver.gebel@ebaeko.de</div>
+                <div class="card-header">
+                    <div class="photo"><img src="https://www.ebaeko.de/wp-content/uploads/2025/09/Oliver_Gebel_DSC5685_web-scaled.jpg" alt="Oliver Gebel" loading="lazy"></div>
+                    <div class="card-body">
+                        <div class="name">Oliver Gebel</div>
+                        <div class="role">Qualitätsmanagement</div>
+                        <div class="contact">Tel: 0441 9711 278<br/>oliver.gebel@ebaeko.de</div>
+                    </div>
+                </div>
             </div>
             <div class="team-card">
                 <div class="name">Bernd Mönnich</div>
@@ -905,9 +952,14 @@
                 <div class="contact">Tel: 0441 9711 223<br/>bernd.moennich@ebaeko.de</div>
             </div>
             <div class="team-card">
-                <div class="name">Andreas Niemeyer</div>
-                <div class="role">Maschinen und Geräte</div>
-                <div class="contact">Tel: 0441 9711 228<br/>andreas.niemeyer@ebaeko.de</div>
+                <div class="card-header">
+                    <div class="photo"><img src="https://www.ebaeko.de/wp-content/uploads/2025/10/web_Niemeyer-scaled.jpg" alt="Andreas Niemeyer" loading="lazy"></div>
+                    <div class="card-body">
+                        <div class="name">Andreas Niemeyer</div>
+                        <div class="role">Maschinen und Geräte</div>
+                        <div class="contact">Tel: 0441 9711 228<br/>andreas.niemeyer@ebaeko.de</div>
+                    </div>
+                </div>
             </div>
             <div class="team-card">
                 <div class="name">Ralf Tuitje</div>
@@ -915,9 +967,14 @@
                 <div class="contact">Tel: 0441 9711 222<br/>ralf.tuitje@ebaeko.de</div>
             </div>
             <div class="team-card">
-                <div class="name">Birgit von Deetzen</div>
-                <div class="role">Kleingeräte</div>
-                <div class="contact">Tel: 0441 9711 224<br/>birgit.vondeetzen@ebaeko.de</div>
+                <div class="card-header">
+                    <div class="photo"><img src="https://www.ebaeko.de/wp-content/uploads/2025/10/web_Birgit-von-Deetzen-scaled.jpg" alt="Birgit von Deetzen" loading="lazy"></div>
+                    <div class="card-body">
+                        <div class="name">Birgit von Deetzen</div>
+                        <div class="role">Kleingeräte</div>
+                        <div class="contact">Tel: 0441 9711 224<br/>birgit.vondeetzen@ebaeko.de</div>
+                    </div>
+                </div>
             </div>
             <div class="team-card">
                 <div class="name">Thomas Seffer</div>
@@ -930,9 +987,14 @@
                 <div class="contact">Tel: 0172 2708119<br/>guenter.schute@ebaeko.de</div>
             </div>
             <div class="team-card">
-                <div class="name">Silke Cordes</div>
-                <div class="role">Seminare</div>
-                <div class="contact">Tel: 0441 9711 148<br/>seminare@ebaeko.de</div>
+                <div class="card-header">
+                    <div class="photo"><img src="https://www.ebaeko.de/wp-content/uploads/2025/10/DSC7561-Bearbeitet-scaled.jpg" alt="Silke Cordes" loading="lazy"></div>
+                    <div class="card-body">
+                        <div class="name">Silke Cordes</div>
+                        <div class="role">Seminare</div>
+                        <div class="contact">Tel: 0441 9711 148<br/>seminare@ebaeko.de</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -950,14 +1012,24 @@
                 <div class="contact">Tel: 0251 7189 255<br/>verkauf-ms@ebaeko.de</div>
             </div>
             <div class="team-card">
-                <div class="name">Marcus Weber</div>
-                <div class="role">Investitionsgüterberatung</div>
-                <div class="contact">Tel: 0160 2789318<br/>marcus.weber@ebaeko.de</div>
+                <div class="card-header">
+                    <div class="photo"><img src="https://www.ebaeko.de/wp-content/uploads/2025/08/Marcus-Weber-scaled.jpg" alt="Marcus Weber" loading="lazy"></div>
+                    <div class="card-body">
+                        <div class="name">Marcus Weber</div>
+                        <div class="role">Investitionsgüterberatung</div>
+                        <div class="contact">Tel: 0160 2789318<br/>marcus.weber@ebaeko.de</div>
+                    </div>
+                </div>
             </div>
             <div class="team-card">
-                <div class="name">Silke Cordes</div>
-                <div class="role">Seminare</div>
-                <div class="contact">Tel: 0441 9711 148<br/>seminare@ebaeko.de</div>
+                <div class="card-header">
+                    <div class="photo"><img src="https://www.ebaeko.de/wp-content/uploads/2025/10/DSC7561-Bearbeitet-scaled.jpg" alt="Silke Cordes" loading="lazy"></div>
+                    <div class="card-body">
+                        <div class="name">Silke Cordes</div>
+                        <div class="role">Seminare</div>
+                        <div class="contact">Tel: 0441 9711 148<br/>seminare@ebaeko.de</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1210,10 +1282,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.querySelector('.nav-hamburger');
     const navLinks = document.querySelector('.nav-links');
     if (hamburger && navLinks) {
-        hamburger.addEventListener('click', function(e) {
+        function toggleNav(e) {
             e.stopPropagation();
+            e.preventDefault();
             navLinks.classList.toggle('active');
-        });
+        }
+        hamburger.addEventListener('click', toggleNav);
+        hamburger.addEventListener('touchend', toggleNav);
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.nav')) {
                 navLinks.classList.remove('active');
