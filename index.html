@@ -100,16 +100,19 @@
             color: rgba(255,255,255,0.5);
             font-size: 1.5rem;
             cursor: pointer;
-            padding: 8px 12px;
+            padding: 12px 16px;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             z-index: 25;
             position: relative;
+            background: none;
+            border: none;
+            outline: none;
+            touch-action: manipulation;
         }
         @media (max-width: 700px) {
             .nav-hamburger { 
                 display: block;
-                touch-action: manipulation;
             }
         }
 
@@ -627,7 +630,7 @@
 
         /* Mobile nav: hamburger toggle */
         .nav-links.active {
-            display: flex;
+            display: flex !important;
             flex-direction: column;
             position: absolute;
             top: 100%;
@@ -688,7 +691,7 @@
         <li><a href="#kontakt">Kontakt</a></li>
         <li><a href="#karriere">Karriere</a></li>
     </ul>
-    <div class="nav-hamburger">☰</div>
+    <button class="nav-hamburger" aria-label="Menü öffnen/schließen">☰</button>
 </nav>
 
 <!-- Hero -->
@@ -1294,48 +1297,57 @@
 
 
 <script>
-// Mobile hamburger toggle - improved for touch devices
-document.addEventListener('DOMContentLoaded', function() {
+// Mobile hamburger toggle - simplified robust version
+(function() {
     var hamburger = document.querySelector('.nav-hamburger');
     var navLinks = document.querySelector('.nav-links');
     if (!hamburger || !navLinks) return;
 
-    function toggleNav(e) {
-        e.stopPropagation();
+    function isMobile() {
+        return window.innerWidth <= 700;
+    }
+
+    function toggleNav() {
         navLinks.classList.toggle('active');
     }
 
-    // Use both click and touchstart for reliable mobile handling
-    hamburger.addEventListener('click', toggleNav);
-    hamburger.addEventListener('touchstart', function(e) {
-        if (e.touches.length === 1) {
-            e.preventDefault();
-            toggleNav(e);
-        }
-    }, { passive: false });
+    function closeNav() {
+        navLinks.classList.remove('active');
+    }
+
+    // Handle all events on hamburger
+    function handleHamburger(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        toggleNav();
+    }
+
+    hamburger.addEventListener('click', handleHamburger);
+    hamburger.addEventListener('touchstart', handleHamburger, { passive: false });
 
     // Close when tapping outside
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('.nav')) {
-            navLinks.classList.remove('active');
+        if (navLinks.classList.contains('active') && !e.target.closest('.nav')) {
+            closeNav();
         }
     });
     document.addEventListener('touchstart', function(e) {
-        if (!e.target.closest('.nav')) {
-            navLinks.classList.remove('active');
+        if (navLinks.classList.contains('active') && !e.target.closest('.nav')) {
+            closeNav();
         }
     }, { passive: true });
 
-    // Close on nav link click/tap
+    // Close on nav link click
     navLinks.querySelectorAll('a').forEach(function(link) {
-        link.addEventListener('click', function() {
-            navLinks.classList.remove('active');
-        });
-        link.addEventListener('touchstart', function() {
-            navLinks.classList.remove('active');
-        }, { passive: true });
+        link.addEventListener('click', closeNav);
+        link.addEventListener('touchstart', closeNav, { passive: true });
     });
-});
+
+    // Also close on resize to desktop
+    window.addEventListener('resize', function() {
+        if (!isMobile()) closeNav();
+    });
+})();
 </script>
 
 <script type="importmap">
