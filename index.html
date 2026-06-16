@@ -33,6 +33,7 @@
             position: fixed;
             top: 0; left: 0;
             pointer-events: none;
+            touch-action: none;
             z-index: 1;
         }
 
@@ -75,6 +76,7 @@
             background: linear-gradient(180deg, rgba(0,16,32,0.9) 0%, transparent 100%);
             backdrop-filter: blur(12px);
             pointer-events: auto;
+            touch-action: manipulation;
         }
         .nav-logo svg { height: 28px; fill: var(--cyan); filter: drop-shadow(0 0 15px rgba(0,159,227,0.3)); }
         .nav-links {
@@ -84,6 +86,7 @@
             font-size: 0.7rem;
             letter-spacing: 0.1em;
             text-transform: uppercase;
+            touch-action: manipulation;
         }
         .nav-links a {
             color: rgba(255,255,255,0.4);
@@ -1282,13 +1285,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.querySelector('.nav-hamburger');
     const navLinks = document.querySelector('.nav-links');
     if (hamburger && navLinks) {
-        function toggleNav(e) {
+        hamburger.addEventListener('click', function(e) {
             e.stopPropagation();
-            e.preventDefault();
             navLinks.classList.toggle('active');
-        }
-        hamburger.addEventListener('click', toggleNav);
-        hamburger.addEventListener('touchend', toggleNav);
+        });
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.nav')) {
                 navLinks.classList.remove('active');
