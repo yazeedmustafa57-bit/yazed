@@ -33,7 +33,6 @@
             position: fixed;
             top: 0; left: 0;
             pointer-events: none;
-            touch-action: none;
             z-index: 1;
         }
 
@@ -96,14 +95,22 @@
         @media (max-width: 700px) {
             .nav-links { display: none; }
         }
-        .nav-hamburger { touch-action: manipulation;
+        .nav-hamburger {
             display: none;
             color: rgba(255,255,255,0.5);
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             cursor: pointer;
+            padding: 8px 12px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            z-index: 25;
+            position: relative;
         }
         @media (max-width: 700px) {
-            .nav-hamburger { display: block; }
+            .nav-hamburger { 
+                display: block;
+                touch-action: manipulation;
+            }
         }
 
         /* Hero */
@@ -648,8 +655,7 @@
         /* Smooth scrolling for all */
         html { scroll-behavior: smooth; }
         body { 
-            -webkit-overflow-scrolling: touch; 
-            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
         }
         ::-webkit-scrollbar { width: 4px; }
 
@@ -1288,27 +1294,47 @@
 
 
 <script>
-// Mobile hamburger toggle
+// Mobile hamburger toggle - improved for touch devices
 document.addEventListener('DOMContentLoaded', function() {
-    const hamburger = document.querySelector('.nav-hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    if (hamburger && navLinks) {
-        hamburger.addEventListener('click', function(e) {
-            e.stopPropagation();
-            navLinks.classList.toggle('active');
-        });
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.nav')) {
-                navLinks.classList.remove('active');
-            }
-        });
-        // Close on link click
-        navLinks.querySelectorAll('a').forEach(function(link) {
-            link.addEventListener('click', function() {
-                navLinks.classList.remove('active');
-            });
-        });
+    var hamburger = document.querySelector('.nav-hamburger');
+    var navLinks = document.querySelector('.nav-links');
+    if (!hamburger || !navLinks) return;
+
+    function toggleNav(e) {
+        e.stopPropagation();
+        navLinks.classList.toggle('active');
     }
+
+    // Use both click and touchstart for reliable mobile handling
+    hamburger.addEventListener('click', toggleNav);
+    hamburger.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 1) {
+            e.preventDefault();
+            toggleNav(e);
+        }
+    }, { passive: false });
+
+    // Close when tapping outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.nav')) {
+            navLinks.classList.remove('active');
+        }
+    });
+    document.addEventListener('touchstart', function(e) {
+        if (!e.target.closest('.nav')) {
+            navLinks.classList.remove('active');
+        }
+    }, { passive: true });
+
+    // Close on nav link click/tap
+    navLinks.querySelectorAll('a').forEach(function(link) {
+        link.addEventListener('click', function() {
+            navLinks.classList.remove('active');
+        });
+        link.addEventListener('touchstart', function() {
+            navLinks.classList.remove('active');
+        }, { passive: true });
+    });
 });
 </script>
 
@@ -1422,7 +1448,7 @@ let mx=0,my=0,tx=0,ty=0;
 document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth)*2-1;my=-(e.clientY/innerHeight)*2+1;});
 let tsx=0,tsy=0,ta=false;
 document.addEventListener('touchstart',e=>{ta=true;if(e.touches.length===1){tsx=e.touches[0].clientX;tsy=e.touches[0].clientY;}},{passive:true});
-document.addEventListener('touchmove',e=>{if(!ta||e.touches.length!==1)return;const dx=Math.abs(e.touches[0].clientX-tsx),dy=Math.abs(e.touches[0].clientY-tsy);if(dx>dy&&dx>10){mx=(e.touches[0].clientX/innerWidth)*2-1;my=-(e.touches[0].clientY/innerHeight)*2+1;}},{passive:true});
+document.addEventListener('touchmove',e=>{if(!ta||e.touches.length!==1)return;const dx=Math.abs(e.touches[0].clientX-tsx),dy=Math.abs(e.touches[0].clientY-tsy),cx=e.touches[0].clientX,cy=e.touches[0].clientY;if(dx>dy&&dx>10){e.preventDefault();mx=(cx/innerWidth)*2-1;my=-(cy/innerHeight)*2+1;}else{ta=false;}},{passive:false});
 document.addEventListener('touchend',()=>{ta=false;mx=0;my=0;},{passive:true});
 
 window.addEventListener('resize',()=>{const w=innerWidth,h=innerHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);composer.setSize(w,h);});
