@@ -1349,7 +1349,6 @@
 
     hamburger.addEventListener('click', toggleNav);
     hamburger.addEventListener('touchstart', toggleNav, { passive: false });
-    hamburger.addEventListener('touchend', function(e) { e.preventDefault(); }, { passive: false });
 
     // Close when tapping outside
     document.addEventListener('click', function(e) {
