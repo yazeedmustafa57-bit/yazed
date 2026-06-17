@@ -40,7 +40,7 @@
         .screen-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 2;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,159,227,0.025) 2px, rgba(0,159,227,0.025) 4px);
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,159,227,0.03) 2px, rgba(0,159,227,0.03) 4px);
             mix-blend-mode: overlay;
         }
         .vignette {
@@ -54,6 +54,48 @@
             opacity: 0;
             background: linear-gradient(135deg, rgba(0,159,227,0.04), rgba(0,240,255,0.03));
             animation: flashRand 12s ease-in-out infinite;
+        }
+
+        /* Glitch text effect for hero title */
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+        }
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .glitch-text::before {
+            color: #ff00c1;
+            z-index: -1;
+            animation: glitch-shift 3s infinite linear alternate-reverse;
+        }
+        .glitch-text::after {
+            color: #00fff7;
+            z-index: -1;
+            animation: glitch-shift 2s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-shift {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 1px); }
+            40% { transform: translate(2px, -1px); }
+            60% { transform: translate(-1px, -1px); }
+            80% { transform: translate(1px, 2px); }
+            100% { transform: translate(0); }
+        }
+        .glitch-trigger {
+            animation: glitch-trigger 6s infinite;
+        }
+        @keyframes glitch-trigger {
+            0%, 90%, 100% { clip-path: inset(0 0 0 0); }
+            92% { clip-path: inset(20% 0 60% 0); transform: translate(3px, -2px); }
+            94% { clip-path: inset(50% 0 30% 0); transform: translate(-3px, 1px); }
+            96% { clip-path: inset(10% 0 70% 0); transform: translate(2px, 2px); }
+            98% { clip-path: inset(60% 0 20% 0); transform: translate(-2px, -1px); }
         }
         @keyframes flashRand {
             0%, 95%, 100% { opacity: 0; }
@@ -308,6 +350,16 @@
             color: rgba(255,255,255,0.4);
             line-height: 1.6;
         }
+        /* Card hover glow effect */
+        .card, .team-card, .news-item {
+            transition: all 0.4s ease;
+        }
+        .card:hover, .team-card:hover, .news-item:hover {
+            box-shadow: 0 0 30px rgba(0,159,227,0.15), 0 0 60px rgba(0,159,227,0.05);
+            border-color: rgba(0,159,227,0.25) !important;
+            transform: translateY(-3px);
+        }
+
         .card .meta {
             font-size: 0.65rem;
             color: rgba(0,159,227,0.3);
@@ -709,7 +761,7 @@
         </svg>
     </div>
     <div class="hero-tag">✦ Genossenschaft der Bäckereien seit 1924</div>
-    <h1>EBÄKO//<br />CYBERPUNK</h1>
+    <h1 class="glitch-text glitch-trigger" data-text="EBÄKO//CYBERPUNK">EBÄKO//<br />CYBERPUNK</h1>
     <p class="hero-sub">VERLÄSSLICHER PARTNER FÜR BÄCKEREIEN · KONDITOREIEN · CAFÉS · WESER-EMS-MITTE</p>
     <div class="hero-cta">
         <a href="#news" class="primary">✦ News entdecken</a>
