@@ -1531,9 +1531,10 @@ for(let i=0;i<15;i++){
 // Mouse
 let mx=0,my=0,tx=0,ty=0;
 document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth)*2-1;my=-(e.clientY/innerHeight)*2+1;});
+// Touch handlers for 3D - never block vertical scrolling
 let tsx=0,tsy=0,ta=false;
 document.addEventListener('touchstart',e=>{ta=true;if(e.touches.length===1){tsx=e.touches[0].clientX;tsy=e.touches[0].clientY;}},{passive:true});
-document.addEventListener('touchmove',e=>{if(!ta||e.touches.length!==1)return;const dx=Math.abs(e.touches[0].clientX-tsx),dy=Math.abs(e.touches[0].clientY-tsy),cx=e.touches[0].clientX,cy=e.touches[0].clientY;if(dx>dy&&dx>10){e.preventDefault();mx=(cx/innerWidth)*2-1;my=-(cy/innerHeight)*2+1;}else{ta=false;}},{passive:false});
+document.addEventListener('touchmove',e=>{if(!ta||e.touches.length!==1)return;const dx=Math.abs(e.touches[0].clientX-tsx),dy=Math.abs(e.touches[0].clientY-tsy),cx=e.touches[0].clientX,cy=e.touches[0].clientY;if(dx>dy&&dx>30){mx=(cx/innerWidth)*2-1;my=-(cy/innerHeight)*2+1;}else{ta=false;mx=0;my=0;}},{passive:true});
 document.addEventListener('touchend',()=>{ta=false;mx=0;my=0;},{passive:true});
 
 window.addEventListener('resize',()=>{const w=innerWidth,h=innerHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);composer.setSize(w,h);});
