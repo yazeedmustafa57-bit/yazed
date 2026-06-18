@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🌿 Ella's Restaurant // 3D</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            overflow-x: hidden; overflow-y: auto;
+            background: #0a0a0f;
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: #f0e6d3;
+        }
+        canvas {
+            display: block; position: fixed; top: 0; left: 0;
+            pointer-events: none; z-index: 1;
+        }
+        .screen-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(255,215,150,0.02) 2px, rgba(255,215,150,0.02) 4px);
+            pointer-events: none; z-index: 2; mix-blend-mode: overlay;
+        }
+        .vignette {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 2;
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(10,10,15,0.8) 100%);
+        }
+
+        .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        .section {
+            position: relative; z-index: 5;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            padding: 4rem 2rem;
+        }
+        .section-inner { max-width: 900px; width: 100%; }
+
+        /* -- Hero -- */
+        .hero { position: relative; z-index: 5; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; }
+        .hero-tag {
+            font-size: 0.6rem; letter-spacing: 0.8em; text-transform: uppercase;
+            color: rgba(255,215,150,0.3); margin-bottom: 0.5rem;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 6rem); font-weight: 300;
+            letter-spacing: 0.1em; line-height: 1.1;
+            background: linear-gradient(135deg, #f0e6d3, #ffd796, #e8c49a, #f0e6d3);
+            background-size: 300% 300%;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradShift 6s ease-in-out infinite;
+        }
+        @keyframes gradShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .hero-sub { font-size: clamp(0.7rem, 1.2vw, 1rem); color: rgba(255,215,150,0.3); margin-top: 0.8rem; letter-spacing: 0.3em; font-weight: 300; }
+        .hero-cta { margin-top: 2rem; }
+        .hero-cta a { display: inline-block; padding: 0.8rem 2.5rem; border: 1px solid rgba(255,215,150,0.2); border-radius: 50px; color: #f0e6d3; text-decoration: none; font-size: 0.75rem; letter-spacing: 0.15em; transition: all 0.4s; background: rgba(255,215,150,0.05); }
+        .hero-cta a:hover { background: rgba(255,215,150,0.12); border-color: rgba(255,215,150,0.4); box-shadow: 0 0 40px rgba(255,215,150,0.1); transform: translateY(-2px); }
+
+        /* -- Nav -- */
+        .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 20; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, rgba(10,10,15,0.9), transparent); backdrop-filter: blur(12px); pointer-events: auto; }
+        .nav-logo { font-size: 1.1rem; letter-spacing: 0.15em; color: #f0e6d3; text-decoration: none; font-weight: 300; }
+        .nav-links { display: flex; gap: 1.5rem; list-style: none; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; }
+        .nav-links a { color: rgba(255,215,150,0.4); text-decoration: none; transition: color 0.3s; }
+        .nav-links a:hover { color: #f0e6d3; }
+        @media (max-width: 700px) { .nav-links { display: none; } }
+        button.nav-hamburger { display: none; color: rgba(255,215,150,0.5); font-size: 1.5rem; cursor: pointer; padding: 12px 16px; background: none; border: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; z-index: 25; position: relative; }
+        @media (max-width: 700px) { button.nav-hamburger { display: block; touch-action: manipulation; } }
+        .nav-links.active { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(10,10,15,0.98); backdrop-filter: blur(20px); padding: 1rem 2rem; gap: 1rem; border-bottom: 1px solid rgba(255,215,150,0.1); pointer-events: auto; z-index: 30; }
+        @media (min-width: 701px) { .nav-links.active { display: flex; flex-direction: row; position: static; background: none; padding: 0; gap: 1.5rem; border: none; } }
+
+        .section-label { font-size: 0.55rem; letter-spacing: 0.6em; text-transform: uppercase; color: rgba(255,215,150,0.25); margin-bottom: 0.5rem; }
+        .section-title { font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 300; letter-spacing: 0.05em; color: #f0e6d3; margin-bottom: 1rem; }
+        .section-desc { font-size: 0.85rem; color: rgba(255,215,150,0.35); max-width: 600px; line-height: 1.7; margin-bottom: 2rem; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 600px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+        .card {
+            padding: 1.8rem; border-radius: 16px;
+            border: 1px solid rgba(255,215,150,0.06);
+            background: rgba(255,215,150,0.015);
+            transition: all 0.4s ease;
+        }
+        .card:hover {
+            box-shadow: 0 0 30px rgba(255,215,150,0.1), 0 0 60px rgba(255,215,150,0.03);
+            border-color: rgba(255,215,150,0.15) !important;
+            transform: translateY(-3px);
+        }
+        .card .icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .card h3 { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; color: #f0e6d3; margin-bottom: 0.5rem; }
+        .card p { font-size: 0.75rem; color: rgba(255,215,150,0.4); line-height: 1.6; }
+        .card .price { color: #ffd796; font-size: 0.9rem; margin-top: 0.5rem; }
+
+        .contact-form { display: grid; gap: 0.8rem; }
+        .contact-form input, .contact-form textarea {
+            width: 100%; padding: 0.7rem 1rem; border-radius: 8px;
+            border: 1px solid rgba(255,215,150,0.15);
+            background: rgba(255,215,150,0.03); color: #f0e6d3;
+            font-size: 0.8rem; outline: none;
+        }
+        .contact-form button {
+            padding: 0.7rem 2rem; border: 1px solid rgba(255,215,150,0.2);
+            border-radius: 8px; background: rgba(255,215,150,0.05);
+            color: #f0e6d3; font-size: 0.8rem; cursor: pointer;
+            letter-spacing: 0.1em; transition: all 0.3s;
+        }
+        .contact-form button:hover { background: rgba(255,215,150,0.12); border-color: rgba(255,215,150,0.3); }
+
+        .footer { padding: 3rem 2rem; text-align: center; position: relative; z-index: 5; border-top: 1px solid rgba(255,215,150,0.05); }
+        .footer p { font-size: 0.7rem; color: rgba(255,215,150,0.2); line-height: 1.8; }
+
+        @media (max-width: 700px) {
+            .section { padding: 3rem 1rem; }
+            .card { padding: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="screen-overlay"></div>
+<div class="vignette"></div>
+
+<nav class="nav">
+    <a href="#" class="nav-logo">✦ Ella's</a>
+    <ul class="nav-links">
+        <li><a href="#uber-uns">Über uns</a></li>
+        <li><a href="#speisekarte">Speisekarte</a></li>
+        <li><a href="#galerie">Galerie</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+    </ul>
+    <button class="nav-hamburger" aria-label="Menü">☰</button>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-tag">✦ Restaurant & Bar</div>
+    <h1>ELLA'S<br/>EUTIN</h1>
+    <p class="hero-sub">GENIESSEN SIE AUSGEZEICHNETE KÜCHE IN EINZIGARTIGER ATMOSPHÄRE</p>
+    <div class="hero-cta"><a href="#speisekarte">Speisekarte entdecken ↓</a></div>
+</section>
+
+<!-- Über uns -->
+<section class="section" id="uber-uns">
+    <div class="section-inner">
+        <div class="section-label reveal">// Über uns</div>
+        <div class="section-title reveal">Willkommen bei Ella's</div>
+        <div class="section-desc reveal">
+            Im Herzen von Eutin gelegen, verbinden wir traditionelle Küche mit modernen Akzenten.<br/>
+            Unsere Gerichte werden mit frischen, regionalen Zutaten zubereitet – mit Leidenschaft und Liebe zum Detail.
+        </div>
+        <div class="grid-2" style="margin-top:2rem">
+            <div class="card reveal"><div class="icon">🌿</div><h3>Regionale Küche</h3><p>Frische Zutaten von Bauernhöfen aus der Umgebung – saisonal und nachhaltig.</p></div>
+            <div class="card reveal"><div class="icon">🍷</div><h3>Erlesene Weine</h3><p>Eine handverlesene Weinbegleitung zu jedem Gericht – vom Winzer direkt ins Glas.</p></div>
+            <div class="card reveal"><div class="icon">🏡</div><h3>Gemütliches Ambiente</h3><p>Historische Backsteinmauern, Kerzenlicht und eine offene Kamin – Wohlfühlen garantiert.</p></div>
+            <div class="card reveal"><div class="icon">👨‍🍳</div><h3>Sterneküche</h3><p>Unser Küchenchef kocht mit Leidenschaft – jede Platte ein Kunstwerk.</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- Speisekarte -->
+<section class="section" id="speisekarte">
+    <div class="section-inner">
+        <div class="section-label reveal">// Speisekarte</div>
+        <div class="section-title reveal">Unsere Spezialitäten</div>
+        <div class="section-desc reveal">Lassen Sie sich von unserer saisonalen Karte überraschen.</div>
+        <div class="grid-3">
+            <div class="card reveal"><div class="icon">🥩</div><h3>Rumpsteak</h3><p>Vom Grill, mit Kräuterbutter und Rosmarinkartoffeln</p><div class="price">24,90 €</div></div>
+            <div class="card reveal"><div class="icon">🐟</div><h3>Lachsfilet</h3><p>Wildlachs mit Dill-Joghurt-Sauce und Gemüse</p><div class="price">19,90 €</div></div>
+            <div class="card reveal"><div class="icon">🥗</div><h3>Bunter Salat</h3><p>Frischer Bauernsalat mit Ziegenkäse und Walnüssen</p><div class="price">12,90 €</div></div>
+            <div class="card reveal"><div class="icon">🍝</div><h3>Truffel-Pasta</h3><p>Frische Bandnudeln mit schwarzem Trüffel und Parmesan</p><div class="price">16,90 €</div></div>
+            <div class="card reveal"><div class="icon">🍔</div><h3>Ella's Burger</h3><p>Dry Aged Beef mit karamellisierten Zwiebeln und Trüffel-Mayo</p><div class="price">15,90 €</div></div>
+            <div class="card reveal"><div class="icon">🍰</div><h3>Tiramisu</h3><p>Hausgemacht mit Mascarpone und Espresso</p><div class="price">8,90 €</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- Galerie -->
+<section class="section" id="galerie">
+    <div class="section-inner">
+        <div class="section-label reveal">// Galerie</div>
+        <div class="section-title reveal">Einblicke</div>
+        <div class="section-desc reveal">Atmosphäre und Momente aus unserem Restaurant.</div>
+        <div class="grid-3">
+            <div class="card reveal" style="min-height:200px;display:flex;align-items:center;justify-content:center;background:rgba(255,215,150,0.03)"><p style="color:rgba(255,215,150,0.2)">🍽 Innenraum</p></div>
+            <div class="card reveal" style="min-height:200px;display:flex;align-items:center;justify-content:center;background:rgba(255,215,150,0.03)"><p style="color:rgba(255,215,150,0.2)">🍷 Weinkeller</p></div>
+            <div class="card reveal" style="min-height:200px;display:flex;align-items:center;justify-content:center;background:rgba(255,215,150,0.03)"><p style="color:rgba(255,215,150,0.2)">🌿 Terrasse</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- Kontakt -->
+<section class="section" id="kontakt">
+    <div class="section-inner">
+        <div class="section-label reveal">// Kontakt</div>
+        <div class="section-title reveal">Reservieren Sie</div>
+        <div class="section-desc reveal">Rufen Sie uns an oder schreiben Sie uns – wir freuen uns auf Sie!</div>
+        <div class="grid-2">
+            <div>
+                <div class="card reveal"><div class="icon">📍</div><h3>Adresse</h3><p>Marktplatz 5<br/>23701 Eutin</p></div>
+                <div class="card reveal" style="margin-top:1rem"><div class="icon">📞</div><h3>Telefon</h3><p>+49 4521 123456</p></div>
+                <div class="card reveal" style="margin-top:1rem"><div class="icon">🕐</div><h3>Öffnungszeiten</h3><p>Di – So: 11:30 – 14:30 & 17:30 – 22:00<br/>Mo: Ruhetag</p></div>
+            </div>
+            <div>
+                <form class="contact-form reveal" onsubmit="alert('Danke! Wir melden uns. (Demo)');return false">
+                    <input type="text" placeholder="Ihr Name" required />
+                    <input type="email" placeholder="Ihre E-Mail" required />
+                    <textarea rows="4" placeholder="Ihre Nachricht / Reservierungswunsch"></textarea>
+                    <button type="submit">📨 Nachricht senden</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <p>✦ Ella's Restaurant Eutin ✦<br/>© 2026 – Alle Rechte vorbehalten</p>
+</footer>
+
+<!-- Scroll + Hamburger JS -->
+<script>
+(function() {
+    document.querySelectorAll('.reveal').forEach(el => { el.style.opacity = '0'; });
+    function reveal() { document.querySelectorAll('.reveal').forEach(el => { const r = el.getBoundingClientRect(); if (r.top < window.innerHeight - 80) { el.style.opacity = ''; el.classList.add('visible'); } }); }
+    document.addEventListener('DOMContentLoaded', reveal);
+    window.addEventListener('scroll', reveal, { passive: true });
+
+    var hamburger = document.querySelector('.nav-hamburger');
+    var navLinks = document.querySelector('.nav-links');
+    if (hamburger && navLinks) {
+        var isOpen = false;
+        function openNav() { navLinks.style.display = 'flex'; navLinks.style.flexDirection = 'column'; navLinks.style.position = 'absolute'; navLinks.style.top = '100%'; navLinks.style.left = '0'; navLinks.style.right = '0'; navLinks.style.background = 'rgba(10,10,15,0.98)'; navLinks.style.backdropFilter = 'blur(20px)'; navLinks.style.padding = '1rem 2rem'; navLinks.style.gap = '1rem'; navLinks.style.borderBottom = '1px solid rgba(255,215,150,0.1)'; navLinks.style.pointerEvents = 'auto'; navLinks.style.zIndex = '30'; isOpen = true; }
+        function closeNav() { navLinks.style.display = ''; navLinks.style.flexDirection = ''; navLinks.style.position = ''; navLinks.style.top = ''; navLinks.style.left = ''; navLinks.style.right = ''; navLinks.style.background = ''; navLinks.style.backdropFilter = ''; navLinks.style.padding = ''; navLinks.style.gap = ''; navLinks.style.borderBottom = ''; navLinks.style.pointerEvents = ''; navLinks.style.zIndex = ''; isOpen = false; }
+        function toggleNav(e) { e.stopPropagation(); e.preventDefault(); if (isOpen) { closeNav(); } else { openNav(); } }
+        hamburger.addEventListener('click', toggleNav);
+        hamburger.addEventListener('touchstart', toggleNav, { passive: false });
+        document.addEventListener('click', function(e) { if (isOpen && !e.target.closest('.nav')) closeNav(); });
+        document.addEventListener('touchstart', function(e) { if (isOpen && !e.target.closest('.nav')) closeNav(); }, { passive: true });
+        navLinks.querySelectorAll('a').forEach(function(link) { link.addEventListener('click', closeNav); link.addEventListener('touchstart', closeNav, { passive: true }); });
+        window.addEventListener('resize', function() { if (window.innerWidth > 700 && isOpen) closeNav(); });
+    }
+})();
+</script>
+
+<!-- Three.js 3D -->
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0a0f);
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 200);
+camera.position.set(0, 0.5, 6);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ReinhardToneMapping;
+document.body.prepend(renderer.domElement);
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.3, 0.1, 0.05);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+scene.add(new THREE.AmbientLight(0xffd796, 0.3));
+const dl = new THREE.DirectionalLight(0xffd796, 1.5); dl.position.set(2, 3, 4); scene.add(dl);
+
+const group = new THREE.Group(); scene.add(group);
+
+// Gold ring
+const ring = new THREE.Mesh(new THREE.TorusGeometry(1.0, 0.015, 16, 64), new THREE.MeshBasicMaterial({ color: 0xe8c49a, transparent: true, opacity: 0.15 }));
+ring.rotation.x = Math.PI / 3; group.add(ring);
+
+const ring2 = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.01, 16, 48), new THREE.MeshBasicMaterial({ color: 0xffd796, transparent: true, opacity: 0.1 }));
+ring2.rotation.x = -0.5; ring2.rotation.z = 0.3; group.add(ring2);
+
+// Fork/Knife-like geometry (abstract)
+const forkGroup = new THREE.Group(); group.add(forkGroup);
+for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    const line = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.5, 4), new THREE.MeshBasicMaterial({ color: 0xc4a882, transparent: true, opacity: 0.08 }));
+    line.position.set(Math.cos(a) * 1.2, 0, Math.sin(a) * 1.2);
+    line.rotation.z = Math.PI / 2;
+    line.rotation.y = a;
+    forkGroup.add(line);
+}
+
+// Food particles (warm colored dots)
+const foodCount = 400; const fPos = new Float32Array(foodCount * 3); const fData = [];
+for (let i = 0; i < foodCount; i++) {
+    const r = 0.3 + Math.random() * 3;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    fData.push({ r, theta, phi, speed: 0.1 + Math.random() * 0.3, off: Math.random() * Math.PI * 2 });
+    fPos[i*3] = Math.sin(phi)*Math.cos(theta)*r;
+    fPos[i*3+1] = Math.sin(phi)*Math.sin(theta)*r;
+    fPos[i*3+2] = Math.cos(phi)*r;
+}
+const fGeo = new THREE.BufferGeometry(); fGeo.setAttribute('position', new THREE.BufferAttribute(fPos, 3));
+const fMat = new THREE.PointsMaterial({ color: 0xe8c49a, size: 0.025, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+const fPts = new THREE.Points(fGeo, fMat); group.add(fPts);
+
+// Stars
+const starCount = 1200; const sPos = new Float32Array(starCount * 3);
+for (let i = 0; i < starCount; i++) {
+    const r = 8 + Math.random() * 40;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    sPos[i*3] = Math.sin(phi)*Math.cos(theta)*r;
+    sPos[i*3+1] = Math.sin(phi)*Math.sin(theta)*r;
+    sPos[i*3+2] = Math.cos(phi)*r;
+}
+const sGeo = new THREE.BufferGeometry(); sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
+const sMat = new THREE.PointsMaterial({ color: 0xffd796, size: 0.04, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+const stars = new THREE.Points(sGeo, sMat); scene.add(stars);
+
+// Mouse tracking
+let mx = 0, my = 0, tx = 0, ty = 0;
+document.addEventListener('mousemove', e => { mx = (e.clientX / innerWidth) * 2 - 1; my = -(e.clientY / innerHeight) * 2 + 1; });
+let tsx = 0, tsy = 0, ta = false;
+document.addEventListener('touchstart', e => { ta = true; if(e.touches.length === 1) { tsx = e.touches[0].clientX; tsy = e.touches[0].clientY; } }, { passive: true });
+document.addEventListener('touchmove', e => { if(!ta || e.touches.length !== 1) return; const dx = Math.abs(e.touches[0].clientX - tsx); const dy = Math.abs(e.touches[0].clientY - tsy); if(dx > dy && dx > 30) { mx = (e.touches[0].clientX / innerWidth) * 2 - 1; my = -(e.touches[0].clientY / innerHeight) * 2 + 1; } else { ta = false; mx = 0; my = 0; } }, { passive: true });
+document.addEventListener('touchend', () => { ta = false; mx = 0; my = 0; }, { passive: true });
+
+window.addEventListener('resize', () => { const w = innerWidth, h = innerHeight; camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); composer.setSize(w, h); });
+
+const clock = new THREE.Clock();
+function animate() {
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+    tx += (mx - tx) * 0.04; ty += (my - ty) * 0.04;
+
+    ring.rotation.x = Math.PI / 3 + Math.sin(t * 0.08) * 0.04;
+    ring.rotation.y = t * 0.04 + tx * 0.3;
+    ring2.rotation.x = -0.5 + Math.sin(t * 0.06 + 1) * 0.05;
+    ring2.rotation.y = -t * 0.03 + ty * 0.2;
+
+    forkGroup.rotation.y = t * 0.02 + tx * 0.2;
+
+    const fp = fPts.geometry.attributes.position.array;
+    for (let i = 0; i < foodCount; i++) {
+        const d = fData[i];
+        const th = d.theta + t * d.speed * 0.02;
+        const ph = d.phi + Math.sin(t * d.speed * 0.01 + d.off) * 0.02;
+        const rr = d.r + Math.sin(t * 0.15 + d.off) * 0.05;
+        fp[i*3] = Math.sin(ph)*Math.cos(th)*rr;
+        fp[i*3+1] = Math.sin(ph)*Math.sin(th)*rr;
+        fp[i*3+2] = Math.cos(ph)*rr;
+    }
+    fPts.geometry.attributes.position.needsUpdate = true;
+
+    camera.position.x = Math.sin(t * 0.008) * 0.3 + tx * 0.5;
+    camera.position.y = 0.5 + Math.sin(t * 0.01) * 0.1 + ty * 0.3;
+    camera.lookAt(0, 0, 0);
+
+    bloom.strength = 0.25 + Math.sin(t * 0.1) * 0.08;
+    composer.render();
+}
+animate();
+</script>
+</body>
+</html>
